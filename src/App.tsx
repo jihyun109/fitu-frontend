@@ -16,6 +16,8 @@ function App() {
         <Route path="/adminrequest" element={<AdminRequest />} />
         <Route path="/adminpost" element={<AdminPost />} />
         <Route path="/adminmember" element={<AdminMember />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/adminlogin" element={<AdminLogin />} />
       </Routes>
     </div>
   );
