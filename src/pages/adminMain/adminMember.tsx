@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import AdminHeader from "../../components/adminHeader/adminHeader";
-import IdSearch from "../../components/adminSearch/adminSearchId";
+import SchoolSearch from "../../components/adminSearch/adminSearchSchool";
 
-const AdminPost: React.FC = () => {
-  const [active, setActive] = useState<"request" | "post" | "member">("member");
-  const [selectedId, setSelectedId] = useState("");
+const AdminMember: React.FC = () => {
+  const [active, setActive] = useState<"request" | "post" | "member">("post");
+  const [selectedSchool, setSelectedSchool] = useState("");
 
   return (
     <>
       <AdminHeader active={active} setActive={setActive} />
 
-      <Post>
-        <IdSearch onIdSelect={setSelectedId} />
-      </Post>
+      <Member>
+        <SchoolSearch onSchoolSelect={setSelectedSchool} />
+      </Member>
 
-      <Selected>{selectedId}</Selected>
+      <Selected>{selectedSchool}</Selected>
     </>
   );
 };
 
-export default AdminPost;
+export default AdminMember;
 
-const Post = styled.div``;
+const Member = styled.div``;
 const Selected = styled.div``;
