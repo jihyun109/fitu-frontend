@@ -19,6 +19,7 @@ function App() {
         <Route path="/adminmember" element={<AdminMember />} />
         <Route path='/' element={<Login/>}/>
         <Route path='/adminlogin' element={<AdminLogin/>}/>
+        <Route path='/mypage' element={<MyPage/>}/>
       </Routes>
     </div>
   );
