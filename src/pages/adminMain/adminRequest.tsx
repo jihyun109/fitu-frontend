@@ -19,6 +19,14 @@ const dummyAddExercise = [
   { id: "user1", date: "2025-09-10", school: "한세대학교", exercise: "벤치프레스" },
   { id: "user2", date: "2025-09-09", school: "서울대학교", exercise: "스쿼트" },
   { id: "user3", date: "2025-09-08", school: "연세대학교", exercise: "데드리프트" },
+  { id: "user1", date: "2025-09-10", school: "한세대학교", exercise: "벤치프레스" },
+  { id: "user2", date: "2025-09-09", school: "서울대학교", exercise: "스쿼트" },
+  { id: "user3", date: "2025-09-08", school: "연세대학교", exercise: "데드리프트" },
+  { id: "user1", date: "2025-09-10", school: "한세대학교", exercise: "벤치프레스" },
+  { id: "user2", date: "2025-09-09", school: "서울대학교", exercise: "스쿼트" },
+  { id: "user3", date: "2025-09-08", school: "연세대학교", exercise: "데드리프트" },
+  { id: "user1", date: "2025-09-10", school: "한세대학교", exercise: "벤치프레스" },
+
 ];
 
 // prettier-ignore
