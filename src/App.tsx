@@ -4,7 +4,7 @@ import AdminLogin from "./pages/adminLogin/adminLogin";
 import AdminRequest from "./pages/adminMain/adminRequest";
 import AdminPost from "./pages/adminMain/adminPost";
 import AdminMember from "./pages/adminMain/adminMember";
-
+import MyPage from './pages/myPage/MyPage';
 import { Route, Routes, useLocation } from "react-router-dom";
 import MoreInfo from './pages/login/moreInfo/MoreInfo';
 
@@ -19,7 +19,6 @@ function App() {
         <Route path="/adminmember" element={<AdminMember />} />
         <Route path='/' element={<Login/>}/>
         <Route path='/adminlogin' element={<AdminLogin/>}/>
-        <Route path='/signup' element={<MoreInfo/>}/>
       </Routes>
     </div>
   );
