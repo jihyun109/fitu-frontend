@@ -1,6 +1,11 @@
 import styled, { createGlobalStyle } from "styled-components";
 
 export const CalendarGlobalStyle = createGlobalStyle`
+  // 좌우 화살표 색
+  .rdp-chevron {
+    fill: black;
+  }
+  
   .rdp-day {
     width: 48px !important;
     height: 48px !important;

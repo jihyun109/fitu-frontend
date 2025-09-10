@@ -8,6 +8,7 @@ import {
   Button,
   ModalBackdrop,
   ModalContent,
+  Row
 } from "./MyPage.styled";
 import Profile from "../../assets/images/anonymous_profile_image2.svg";
 import BodyInput from "./components/BodyInput";
@@ -16,6 +17,7 @@ import ProfileHistory from "./components/ProfileHistory";
 import LineChart from "./components/BodyStatLineChart";
 import Calendar from "./components/Calendar";
 import { format } from "date-fns";
+import { Line } from "recharts";
 
 type WorkoutDetail = {
   name: string;
@@ -184,47 +186,82 @@ export default function MyPage() {
       {/* 탭 내용 */}
       {activeTab === "record" && (
         <div>
-          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}} />
+          <div
+            style={{
+              width: "100%",
+              height: "10px",
+              backgroundColor: "#F2F4F5",
+            }}
+          />
           <Calendar records={records} month={month} onMonthChange={setMonth} />
-          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}} />
-          
+          <div
+            style={{
+              width: "100%",
+              height: "10px",
+              backgroundColor: "#F2F4F5",
+            }}
+          />
         </div>
       )}
 
       {activeTab === "profile" && (
         <>
+          <div
+            style={{
+              width: "100%",
+              height: "10px",
+              backgroundColor: "#F2F4F5",
+            }}
+          />
           <TopSection>
             <BodyInfoSection>
-              <SectionTitle>나의 신체 정보</SectionTitle>
-              <BodyInput
-                name="키"
-                id="height"
-                unit="cm"
-                value={bodyData.height}
-                onChange={inputChange}
-              />
-              <BodyInput
-                name="몸무게"
-                id="weight"
-                unit="kg"
-                value={bodyData.weight}
-                onChange={inputChange}
-              />
-              <BodyInput
-                name="골격근량"
-                id="muscle"
-                unit="kg"
-                value={bodyData.muscle}
-                onChange={inputChange}
-              />
-              <BodyInput
-                name="체지방률"
-                id="bodyFat"
-                unit="%"
-                value={bodyData.bodyFat}
-                onChange={inputChange}
-              />
-              <Button onClick={saveLogic}>수정하기</Button>
+              <SectionTitle>김주민</SectionTitle>
+              <Row>
+                <BodyInput
+                  name="키"
+                  id="height"
+                  unit="cm"
+                  value={bodyData.height}
+                  onChange={inputChange}
+                />
+                <BodyInput
+                  name="체중"
+                  id="weight"
+                  unit="kg"
+                  value={bodyData.weight}
+                  onChange={inputChange}
+                />
+              </Row>
+              <Row>
+                <BodyInput
+                  name="골격근량"
+                  id="muscle"
+                  unit="kg"
+                  value={bodyData.muscle}
+                  onChange={inputChange}
+                />
+                <BodyInput
+                  name="체지방률"
+                  id="bodyFat"
+                  unit="%"
+                  value={bodyData.bodyFat}
+                  onChange={inputChange}
+                />
+              </Row>
+              <Button
+                onClick={saveLogic}
+                style={{
+                  fontSize: "13px",
+                  width: "45px",
+                  height: "30px",
+                  border: "1px solid #ABB5BD",
+                  borderRadius: "40%",
+                  backgroundColor: "white",
+                  color: "#ABB5BD",
+                  marginBottom: "10px",
+                }}>
+                수정
+              </Button>
             </BodyInfoSection>
 
             <ProfileWrapper>
@@ -240,8 +277,12 @@ export default function MyPage() {
               )}
             </ProfileWrapper>
           </TopSection>
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}}/>
+          
+          <LineChart />
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}}/>
 
-          <Button
+          {/* <Button
             style={{
               position: "fixed",
               bottom: 80,
@@ -256,9 +297,9 @@ export default function MyPage() {
             onClick={() => setShowChartModal(true)}
           >
             내 몸의 변화보기
-          </Button>
+          </Button> */}
 
-          {showChartModal && (
+          {/* {showChartModal && (
             <ModalBackdrop>
               <ModalContent>
                 <Button
@@ -278,7 +319,8 @@ export default function MyPage() {
                 <LineChart />
               </ModalContent>
             </ModalBackdrop>
-          )}
+          )} */}
+
         </>
       )}
     </MyPageLayout>

@@ -3,18 +3,13 @@ import styled from "styled-components";
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   justify-content: flex-start;
 `;
 
 // 상단
 export const TopSection = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  max-width: 402px;
-  margin: 5rem auto 0 auto;
-  width: 100%;
+  width: 80%;
 `;
 
 // 신체 정보
@@ -22,32 +17,40 @@ export const BodyInfoSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 60%;
+  width: 100%;
+  padding-left: 20px;
+`;
+
+export const Row = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+  margin-bottom: 12px;
 `;
 
 export const SectionTitle = styled.p`
-  font-size: 1.25rem;
   color: black;
-  border-bottom: 2px solid black;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 22px;
+  margin-bottom: 20px;
 `;
 
 export const ProfileWrapper = styled.div`
-  width: 200px;
+  width: 35%;
   height: 200px;
-  margin-left: 16px;
-  margin-top: 2.5rem;
+  margin-left: 20px;
+  margin-top: 30px;
 `;
 
 export const Button = styled.button`
   font-weight: bold;
+  font-size: 18px;
   border: 2px;
   border-radius: 8px;
   width: 100%;
-  margin-top: 16px;
-  padding: 8px 0;
-  cursor: pointer;
+  margin-top: 16px; // 4%정도
+  padding-bottom: 10px;
 `;
 
 // 그래프 모달
@@ -69,3 +72,4 @@ export const ModalContent = styled.div`
   border-radius: 12px;
   position: relative;
 `;
+

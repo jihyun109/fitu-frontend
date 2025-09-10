@@ -14,10 +14,10 @@ import styled from "styled-components";
 
 const ChartContainer = styled.div`
   width: 100%;
-  height: 380px;
+  max-width: 800px;
+  height: 350px;
 `;
 
-// 차트 데이터 타입 정의
 interface ChartData {
   date: string;
   muscle: number;
@@ -72,14 +72,31 @@ export default function BodyStatLineChart() {
   return (
     <ChartContainer>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
+        <LineChart data={data} margin={{top:15, right:55, bottom:20}}>
+
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} angle={-40} height={55} textAnchor="end" />
+          <XAxis
+            dataKey="date"
+            tick={{ fontSize: 12 }}
+            angle={-40}
+            height={55}
+            textAnchor="end"
+          />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="muscle" stroke="#8884d8" name="골격근량" />
-          <Line type="monotone" dataKey="bodyFat" stroke="#82ca9d" name="체지방률" />
+          <Line
+            type="monotone"
+            dataKey="muscle"
+            stroke="#8884d8"
+            name="골격근량"
+          />
+          <Line
+            type="monotone"
+            dataKey="bodyFat"
+            stroke="#82ca9d"
+            name="체지방률"
+          />
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>
