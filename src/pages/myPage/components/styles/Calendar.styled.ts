@@ -8,7 +8,6 @@ export const CalendarGlobalStyle = createGlobalStyle`
     font-size: 1.1rem;
     text-align: center;
     border-radius: 50%;
-    transition: background-color 0.2s, color 0.2s;
   }
 
   // 기록 있는 날짜
@@ -23,18 +22,14 @@ export const CalendarGlobalStyle = createGlobalStyle`
     color: black !important;
   }
 
-  .rdp {
-    padding-bottom: 40px;
-  }
-
   .rdp-caption_label,
   .rdp-head_cell {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 `;
 
 export const CalendarWrapper = styled.div`
-  min-height: 100vh;
+  min-height: 50%;
   padding: 2.5rem;
   display: flex;
   flex-direction: column;

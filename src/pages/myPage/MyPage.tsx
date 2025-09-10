@@ -144,48 +144,100 @@ export default function MyPage() {
 
   return (
     <MyPageLayout>
-      {/* 기록과 프로필 탭 분리 -> borderbottom이랑 css들 맞춰서 수정해야함 */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "40px", marginBottom: "5px", borderBottom: "1px solid #CED4D8"}}>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "40px",
+          borderBottom: "1px solid #CED4D8",
+        }}
+      >
         <Button
           onClick={() => setActiveTab("record")}
-          style={{ color : activeTab === "record" ? "#17A1FA" : "#CED4DB" , 
-          background: "#FFFFFF",
-          borderBottom: `2px solid ${activeTab === "record" ? "#17A1FA" : "#CED4DB"}`,
-          borderRadius: 0
+          style={{
+            color: activeTab === "record" ? "#17A1FA" : "#CED4DB",
+            background: "#FFFFFF",
+            borderBottom: `2px solid ${
+              activeTab === "record" ? "#17A1FA" : "#CED4DB"
+            }`,
+            borderRadius: 0,
           }}
         >
           기록
         </Button>
         <Button
           onClick={() => setActiveTab("profile")}
-          style={{ color : activeTab === "profile" ? "#17A1FA" : "#CED4DB", 
-          background: "#FFFFFF",
-          borderBottom: `2px solid ${activeTab === "profile" ? "#17A1FA" : "#CED4DB"}`,
-          borderRadius: 0
-        }}
+          style={{
+            color: activeTab === "profile" ? "#17A1FA" : "#CED4DB",
+            background: "#FFFFFF",
+            borderBottom: `2px solid ${
+              activeTab === "profile" ? "#17A1FA" : "#CED4DB"
+            }`,
+            borderRadius: 0,
+          }}
         >
           프로필
         </Button>
       </div>
 
       {/* 탭 내용 */}
-      {activeTab === "record" && <Calendar records={records} month={month} onMonthChange={setMonth} />}
+      {activeTab === "record" && (
+        <div>
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}} />
+          <Calendar records={records} month={month} onMonthChange={setMonth} />
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}} />
+          
+        </div>
+      )}
 
       {activeTab === "profile" && (
         <>
           <TopSection>
             <BodyInfoSection>
               <SectionTitle>나의 신체 정보</SectionTitle>
-              <BodyInput name="키" id="height" unit="cm" value={bodyData.height} onChange={inputChange} />
-              <BodyInput name="몸무게" id="weight" unit="kg" value={bodyData.weight} onChange={inputChange} />
-              <BodyInput name="골격근량" id="muscle" unit="kg" value={bodyData.muscle} onChange={inputChange} />
-              <BodyInput name="체지방률" id="bodyFat" unit="%" value={bodyData.bodyFat} onChange={inputChange} />
+              <BodyInput
+                name="키"
+                id="height"
+                unit="cm"
+                value={bodyData.height}
+                onChange={inputChange}
+              />
+              <BodyInput
+                name="몸무게"
+                id="weight"
+                unit="kg"
+                value={bodyData.weight}
+                onChange={inputChange}
+              />
+              <BodyInput
+                name="골격근량"
+                id="muscle"
+                unit="kg"
+                value={bodyData.muscle}
+                onChange={inputChange}
+              />
+              <BodyInput
+                name="체지방률"
+                id="bodyFat"
+                unit="%"
+                value={bodyData.bodyFat}
+                onChange={inputChange}
+              />
               <Button onClick={saveLogic}>수정하기</Button>
             </BodyInfoSection>
 
             <ProfileWrapper>
-              <ProfileImage viewImage={profileImg} onClick={() => setShowHistory(true)} />
-              {showHistory && <ProfileHistory onClose={() => setShowHistory(false)} onImageChange={imageChange} />}
+              <ProfileImage
+                viewImage={profileImg}
+                onClick={() => setShowHistory(true)}
+              />
+              {showHistory && (
+                <ProfileHistory
+                  onClose={() => setShowHistory(false)}
+                  onImageChange={imageChange}
+                />
+              )}
             </ProfileWrapper>
           </TopSection>
 

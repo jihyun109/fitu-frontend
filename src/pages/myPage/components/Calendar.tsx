@@ -2,13 +2,13 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useState } from "react";
 import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import {
   CalendarGlobalStyle,
   CalendarWrapper,
   DayPickerWrapper,
   WorkoutListWrapper,
 } from "./styles/Calendar.styled";
-import styled from "styled-components";
 
 type WorkoutDetail = {
   name: string;
@@ -28,6 +28,7 @@ type CalendarProps = {
   month: Date;
   onMonthChange: (date: Date) => void;
 };
+
 
 export default function Calendar({ records, month, onMonthChange }: CalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
@@ -57,6 +58,7 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
       <CalendarGlobalStyle />
       <DayPickerWrapper>
         <DayPicker
+          locale={ko}
           mode="single"
           month={month}
           selected={selectedDate}
@@ -70,6 +72,7 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
             recorded: "recorded-day",
             noRecord: "norecord-day",
           }}
+          navLayout="around"
         />
       </DayPickerWrapper>
 
