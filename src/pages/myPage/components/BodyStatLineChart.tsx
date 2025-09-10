@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
   LineChart,
@@ -12,6 +10,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import dayjs from "dayjs";
+import styled from "styled-components";
+
+const ChartContainer = styled.div`
+  width: 100%;
+  height: 380px;
+`;
 
 // 차트 데이터 타입 정의
 interface ChartData {
@@ -66,7 +70,7 @@ export default function BodyStatLineChart() {
   }, []);
 
   return (
-    <div className="w-full h-[380px]">
+    <ChartContainer>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
@@ -78,6 +82,6 @@ export default function BodyStatLineChart() {
           <Line type="monotone" dataKey="bodyFat" stroke="#82ca9d" name="체지방률" />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </ChartContainer>
   );
 }

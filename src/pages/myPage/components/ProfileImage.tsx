@@ -1,5 +1,5 @@
 import React from "react";
-import * as S from "./styled_components/ProfileImage.styled";
+import * as S from "./styles/ProfileImage.styled";
 
 type ProfileImageProps = {
   viewImage: string;

@@ -1,15 +1,13 @@
 import styled from "styled-components";
 
-// 페이지 전체 컨테이너
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   justify-content: flex-start;
-  padding: 0 16px;
 `;
 
-// 상단 정보 영역
+// 상단
 export const TopSection = styled.div`
   display: flex;
   justify-content: space-between;
@@ -19,7 +17,7 @@ export const TopSection = styled.div`
   width: 100%;
 `;
 
-// 신체 정보 입력 영역
+// 신체 정보
 export const BodyInfoSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -35,7 +33,6 @@ export const SectionTitle = styled.p`
   margin-bottom: 8px;
 `;
 
-// 프로필 이미지 영역
 export const ProfileWrapper = styled.div`
   width: 200px;
   height: 200px;
@@ -43,10 +40,9 @@ export const ProfileWrapper = styled.div`
   margin-top: 2.5rem;
 `;
 
-// 버튼
 export const Button = styled.button`
   font-weight: bold;
-  border: 2px solid black;
+  border: 2px;
   border-radius: 8px;
   width: 100%;
   margin-top: 16px;
@@ -54,7 +50,7 @@ export const Button = styled.button`
   cursor: pointer;
 `;
 
-// 차트 모달
+// 그래프 모달
 export const ModalBackdrop = styled.div`
   position: fixed;
   inset: 0;

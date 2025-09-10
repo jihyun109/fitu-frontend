@@ -4,7 +4,7 @@ export const Container = styled.div`
   position: relative;
   width: 300px;
   height: 300px;
-  background-color: #f3f4f6; /* gray-100 */
+  background-color: #f3f4f6;
   border-radius: 0.5rem;
   overflow: hidden;
 `;
@@ -21,22 +21,22 @@ export const ButtonGroup = styled.div`
 `;
 
 export const CancelButton = styled.button`
-  background-color: #d1d5db; /* gray-300 */
+  background-color: #d1d5db;
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
   transition: background-color 0.2s;
   &:hover {
-    background-color: #9ca3af; /* gray-400 */
+    background-color: #9ca3af;
   }
 `;
 
 export const ConfirmButton = styled.button`
-  background-color: #06b6d4; /* cyan-500 */
+  background-color: #06b6d4;
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
   color: white;
   transition: background-color 0.2s;
   &:hover {
-    background-color: #0891b2; /* cyan-600 */
+    background-color: #0891b2;
   }
 `;

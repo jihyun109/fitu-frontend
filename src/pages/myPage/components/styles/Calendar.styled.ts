@@ -1,17 +1,26 @@
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from "styled-components";
 
 export const CalendarGlobalStyle = createGlobalStyle`
   .rdp-day {
-    padding: 20px 0 !important;
-    height: 60px !important;
-    line-height: 60px !important;
+    width: 48px !important;
+    height: 48px !important;
+    line-height: 48px !important;
     font-size: 1.1rem;
+    text-align: center;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
   }
 
-  .rdp-day_selected,
-  .rdp-day_selected:focus {
-    height: 60px !important;
-    line-height: 60px !important;
+  // 기록 있는 날짜
+  .recorded-day {
+    background-color: #E6F4FD !important;
+    color: #007AFF !important;
+  }
+
+  // 기록 없는 날짜
+  .norecord-day {
+    background-color: white !important;
+    color: black !important;
   }
 
   .rdp {
@@ -26,7 +35,7 @@ export const CalendarGlobalStyle = createGlobalStyle`
 
 export const CalendarWrapper = styled.div`
   min-height: 100vh;
-  padding: 1rem;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -45,7 +54,7 @@ export const WorkoutListWrapper = styled.div`
   background-color: white;
   border-radius: 0.5rem;
   padding: 1rem;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   text-align: center;
 
   p {

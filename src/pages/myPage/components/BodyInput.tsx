@@ -1,5 +1,5 @@
 import React from "react";
-import * as S from "./styled_components/BodyInput.styled";
+import * as S from "./styles/BodyInput.styled";
 
 type BodyInputProps = {
   name: string;

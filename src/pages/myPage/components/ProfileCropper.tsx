@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import Cropper, { Area } from "react-easy-crop";
-import * as S from "./styled_components/ProfileCropper.styled";
+import * as S from "./styles/ProfileCropper.styled";
 
 type ProfileCropperProps = {
   imageSrc: string;
