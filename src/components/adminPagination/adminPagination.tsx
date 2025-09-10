@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import Pagemove from "../../assets/images/Pagemove.png";
+import LeftArrow from "../../assets/images/LeftArrow.png";
+
 interface PaginationProps {
   totalItems: number;
   itemsPerPage: number;
@@ -32,7 +33,7 @@ const Pagination: React.FC<PaginationProps> = ({
     <Container>
       {startPage > 1 && (
         <PageButton onClick={() => onPageChange(startPage - 1)}>
-          {"<"}
+          <img src={LeftArrow} alt="left" />
         </PageButton>
       )}
 
@@ -46,7 +47,14 @@ const Pagination: React.FC<PaginationProps> = ({
         </PageButton>
       ))}
       {endPage < totalPages && (
-        <PageButton onClick={() => onPageChange(endPage + 1)}>{">"}</PageButton>
+        <PageButton onClick={() => onPageChange(endPage + 1)}>
+          {" "}
+          <img
+            src={LeftArrow}
+            alt="right"
+            style={{ transform: "scaleX(-1)" }}
+          />
+        </PageButton>
       )}
     </Container>
   );
@@ -61,7 +69,7 @@ const Container = styled.div`
 `;
 
 const PageButton = styled.button<{ active?: boolean }>`
-  margin: 0 4px;
+  margin: 4px 4px;
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
