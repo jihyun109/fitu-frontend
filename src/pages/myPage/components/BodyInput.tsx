@@ -26,14 +26,16 @@ export default function BodyInput({
   return (
     <S.Container>
       <S.Label>{name}</S.Label>
-      <S.Input
-        id={id}
-        type="text"
-        value={value}
-        onChange={bodyChange}
-        placeholder={placeholder}
-      />
-      {unit && <S.Unit>{unit}</S.Unit>}
+      <S.InputWrapper>
+        <S.Input
+          id={id}
+          type="text"
+          value={value}
+          onChange={bodyChange}
+          placeholder={placeholder}
+        />
+        {unit && <S.Unit>{unit}</S.Unit>}
+      </S.InputWrapper>
     </S.Container>
   );
 }

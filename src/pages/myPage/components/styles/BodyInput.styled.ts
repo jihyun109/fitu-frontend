@@ -2,35 +2,39 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
 `;
 
 export const Label = styled.span`
-  width: 45%;
-  font-size: 1rem;
-  color: black;
+  font-size: 14px;
+  color: #7a7a7a;
+  padding-bottom: 5px;
+  padding-left: 3px;
+`;
+
+export const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
 `;
 
 export const Input = styled.input`
-  width: 40%;
-  padding: 4px;
-  border-radius: 6px;
-  text-align: right;
-  font-size: 0.875rem;
-  background-color: #4b4b4b;
-  color: white;
-  border: 1px solid black;
-
-  &:focus {
-    outline: none;
-    border-color: #00bcd4;
-  }
+  flex: 1;
+  width: 45%;
+  text-align: left;
+  font-weight: bold;
+  font-size: 20px;
+  background-color: white;
+  color: black;
+  border: none;
 `;
 
 export const Unit = styled.span`
   margin-left: 4px;
-  font-size: 0.875rem;
-  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  color: black;
+  white-space: nowrap;
 `;
