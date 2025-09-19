@@ -72,14 +72,16 @@ const AdminDataTable: React.FC<AdminDataTableProps> = ({
 export default AdminDataTable;
 
 const TableContainer = styled.div`
-  margin: 10px 367px;
-  overflow-x: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: auto;
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   border-bottom: 1px solid #d2d2d2;
+  table-layout: fixed;
 `;
 
 const Th = styled.th`
@@ -108,7 +110,7 @@ const Tr = styled.tr`
 
 const Td = styled.td`
   text-align: center;
-  padding: 12px 40px;
+  padding: 12px 16px;
 
   white-space: nowrap;
   font-size: 20;

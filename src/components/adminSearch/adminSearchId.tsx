@@ -80,8 +80,12 @@ const IdSearch: React.FC<IdSearchProps> = ({ onIdSelect }) => {
 export default IdSearch;
 
 const SearchContainer = styled.div`
-  position: relative;
-  margin-left: 357px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  min-width: 600px;
+  margin: 0 auto;
 `;
 
 const SearchBar = styled.div`
