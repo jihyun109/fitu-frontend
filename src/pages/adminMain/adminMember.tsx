@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AdminHeader from "../../components/adminHeader/adminHeader";
+
 import SchoolSearch from "../../components/adminSearch/adminSearchSchool";
 import DataTable from "../../components/adminDatatable/adminDatatable";
 import Pagination from "../../components/adminPagination/adminPagination";
@@ -34,8 +34,6 @@ const AdminMember: React.FC = () => {
 
   return (
     <>
-      <AdminHeader active={active} setActive={setActive} />
-
       <Member>
         <SchoolSearch onSchoolSelect={setSelectedSchool} />
       </Member>

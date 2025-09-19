@@ -1,6 +1,7 @@
 import "./App.css";
 import Login from "./pages/login/Login";
 import AdminLogin from "./pages/adminLogin/adminLogin";
+import AdminPage from "./pages/adminMain/adminPage";
 import AdminRequest from "./pages/adminMain/adminRequest";
 import AdminPost from "./pages/adminMain/adminPost";
 import AdminMember from "./pages/adminMain/adminMember";
@@ -17,9 +18,12 @@ function App() {
         <Route path="/home" element={<MainPage />} />
         <Route path="/login/oauth" element={<KakaoOauth />} />
         <Route path="/adminlogin" element={<AdminLogin />} />
-        <Route path="/adminrequest" element={<AdminRequest />} />
-        <Route path="/adminpost" element={<AdminPost />} />
-        <Route path="/adminmember" element={<AdminMember />} />
+        <Route path="/admin" element={<AdminPage />}>
+          <Route index element={<AdminRequest />} />
+          <Route path="request" element={<AdminRequest />} />
+          <Route path="post" element={<AdminPost />} />
+          <Route path="member" element={<AdminMember />} />
+        </Route>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<MoreInfo />} />
         <Route path="/mypage" element={<MyPage />} />
