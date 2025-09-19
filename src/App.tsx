@@ -4,9 +4,9 @@ import AdminLogin from "./pages/adminLogin/adminLogin";
 import AdminRequest from "./pages/adminMain/adminRequest";
 import AdminPost from "./pages/adminMain/adminPost";
 import AdminMember from "./pages/adminMain/adminMember";
-import MyPage from './pages/myPage/MyPage';
+import MyPage from "./pages/myPage/MyPage";
 import { Route, Routes, useLocation } from "react-router-dom";
-import MoreInfo from './pages/login/moreInfo/MoreInfo';
+import MoreInfo from "./pages/login/moreInfo/MoreInfo";
 import KakaoOauth from "./pages/login/KakaoOauth";
 import MainPage from "./pages/mianPage/mainPage";
 
@@ -20,10 +20,9 @@ function App() {
         <Route path="/adminrequest" element={<AdminRequest />} />
         <Route path="/adminpost" element={<AdminPost />} />
         <Route path="/adminmember" element={<AdminMember />} />
-        <Route path='/' element={<Login/>}/>
-        <Route path='/adminlogin' element={<AdminLogin/>}/>
-        <Route path='/signup' element={<MoreInfo/>}/>
-        <Route path='/mypage' element={<MyPage/>}/>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<MoreInfo />} />
+        <Route path="/mypage" element={<MyPage />} />
       </Routes>
     </div>
   );

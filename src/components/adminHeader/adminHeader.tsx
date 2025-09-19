@@ -56,7 +56,6 @@ export default AdminHeader;
 
 const HeaderContainer = styled.header`
   display: flex;
-  justify-content: space-between;
   padding: 33px 24px;
   margin: 21px 367px;
   align-items: center;
