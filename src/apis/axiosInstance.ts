@@ -1,7 +1,8 @@
 import axios from "axios";
 
+const BASE_URL = process.env.REACT_APP_SERVER_URL
 const axiosInstance = axios.create({
-  baseURL: "http://ec2-3-35-143-24.ap-northeast-2.compute.amazonaws.com:8080",
+  baseURL: `${BASE_URL}`,
   headers: {
     "Content-Type": "application/json",
   },
