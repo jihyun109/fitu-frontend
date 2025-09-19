@@ -93,6 +93,38 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
     }
   };
 
+  // 이미지 히스토리 - 이미지 삭제
+  const handleDelete = async (imgUrl: string) => {
+    const token = sessionStorage.getItem("Authorization");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/body-image`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageUrl: imgUrl }),
+      });
+
+      if (!res.ok) throw new Error("이미지 삭제 실패");
+
+      const updated = historyImages.filter((url) => url !== imgUrl);
+      setHistoryImages(updated);
+
+      // 이미지 삭제하고 어떤 이미지로 변경할지 선택해야함
+      if (updated.length === 0) {
+        onImageChange(DefaultProfile);
+      } else if (imgUrl === updated[0]) {
+        onImageChange(updated[0]);
+      }
+    } catch (err) {
+      console.error("이미지 삭제 에러:", err);
+      alert("이미지 삭제에 실패했습니다.");
+    }
+  };
+
   return (
     <S.Overlay>
       {!showCropper && (

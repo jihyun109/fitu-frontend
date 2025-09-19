@@ -29,9 +29,8 @@ type CalendarProps = {
   onMonthChange: (date: Date) => void;
 };
 
-
 export default function Calendar({ records, month, onMonthChange }: CalendarProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const recordsMap = new Map<string, WorkoutRecord["workout"]>();
   records.forEach(({ date, workout }) => {
@@ -50,7 +49,7 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
   const recordedDates = new Set(records.map((r) => r.date));
   const noRecordDates = allDatesInMonth.filter((d) => !recordedDates.has(d));
 
-  const selectedKey = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+  const selectedKey = format(selectedDate, "yyyy-MM-dd");
   const selectedWorkouts = recordsMap.get(selectedKey) || [];
 
   return (
@@ -62,7 +61,7 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
           mode="single"
           month={month}
           selected={selectedDate}
-          onSelect={setSelectedDate}
+          onSelect={(date) => date && setSelectedDate(date)}
           onMonthChange={onMonthChange}
           modifiers={{
             recorded: Array.from(recordedDates).map((d) => new Date(d)),
@@ -75,23 +74,21 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
           navLayout="around"
         />
       </DayPickerWrapper>
-
-      {selectedDate && (
-        <WorkoutListWrapper>
-          <p>선택한 날짜 : {selectedKey}</p>
-          {selectedWorkouts.length > 0 ? (
-            <ul>
-              {selectedWorkouts.map((item, index) => (
-                <li key={index}>
-                  {item.name} - {item.sets}세트, {item.weight}kg, {item.repsPerSet}회
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>운동 기록 없음</p>
-          )}
-        </WorkoutListWrapper>
-      )}
+      <div style={{ width: "150%", height: "10px", backgroundColor: "#F2F4F5", marginTop: "30px"}} />
+      <WorkoutListWrapper>
+        <p>{selectedKey}</p>
+        {selectedWorkouts.length > 0 ? (
+          <ul>
+            {selectedWorkouts.map((item, index) => (
+              <li key={index}>
+                {item.name} <br /> {item.sets}세트, {item.weight}kg, {item.repsPerSet}회
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>운동 기록 없음</p>
+        )}
+      </WorkoutListWrapper>
     </CalendarWrapper>
   );
 }

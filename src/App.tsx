@@ -9,6 +9,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import MoreInfo from './pages/login/moreInfo/MoreInfo';
 import KakaoOauth from "./pages/login/KakaoOauth";
 import MainPage from "./pages/mianPage/mainPage";
+import InvitePage from "./pages/myPage/components/InvitePage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path='/adminlogin' element={<AdminLogin/>}/>
         <Route path='/signup' element={<MoreInfo/>}/>
         <Route path='/mypage' element={<MyPage/>}/>
+        <Route path='/invite' element={<InvitePage/>}/>
       </Routes>
     </div>
   );
