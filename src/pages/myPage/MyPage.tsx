@@ -8,7 +8,7 @@ import {
   Button,
   Row,
 } from "./MyPage.styled";
-import Profile from "../../assets/images/anonymous_profile_image2.svg";
+import Profile from "../../assets/images/default_profileImage.png";
 import BodyInput from "./components/BodyInput";
 import ProfileImage from "./components/ProfileImage";
 import ProfileHistory from "./components/ProfileHistory";

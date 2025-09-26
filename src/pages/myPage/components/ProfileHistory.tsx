@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import ProfileCropper from "./ProfileCropper";
 import * as S from "./styles/ProfileHistory.styled";
-import DefaultProfile from "../../../assets/images/anonymous_profile_image2.svg";
+import DefaultProfile from "../../../assets/images/default_profileImage.png";
 
 interface ProfileHistoryProps {
   onClose: () => void;
