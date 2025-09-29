@@ -1,35 +1,73 @@
 import React from "react";
 import styled from "styled-components";
+import { FormData } from "../../../../types/type";
 
-const Step2Form: React.FC = () => {
+interface Step2FormProps {
+  formData: FormData
+  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  onSubmit: () => void;
+}
+
+const Step2Form: React.FC<Step2FormProps> = ({ formData, setFormData, onSubmit }) => {
   return (
     <Form>
       <Title>신체 정보</Title>
+
       <Label>키와 몸무게</Label>
       <Row>
-        <Input type="number" style={{ width: "80px" }} />
+        <Input
+          type="number"
+          style={{ width: "80px" }}
+          value={formData.height}
+          onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+        />
         <Unit>cm</Unit>
-        <Input type="number" style={{ width: "80px" }} />
+        <Input
+          type="number"
+          style={{ width: "80px" }}
+          value={formData.weight}
+          onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+        />
         <Unit>kg</Unit>
       </Row>
-    <Label>골격근량(선택)</Label>
+
+      <Label>골격근량(선택)</Label>
       <Row>
-        <Input type="number"  />
+        <Input
+          type="number"
+          value={formData.muscle}
+          onChange={(e) => setFormData({ ...formData, muscle: e.target.value })}
+        />
         <Unit>kg</Unit>
       </Row>
-  <Label>체지방률(선택)</Label>
+
+      <Label>체지방률(선택)</Label>
       <Row>
-        <Input type="number" />
+        <Input
+          type="number"
+          value={formData.fat}
+          onChange={(e) => setFormData({ ...formData, fat: e.target.value })}
+        />
         <Unit>%</Unit>
       </Row>
 
       <Label>성별</Label>
       <GenderRow>
-        <GenderButton selected>남성</GenderButton>
-        <GenderButton>여성</GenderButton>
+        <GenderButton
+          selected={formData.gender === "M"}
+          onClick={() => setFormData({ ...formData, gender: "M" })}
+        >
+          남성
+        </GenderButton>
+        <GenderButton
+          selected={formData.gender === "F"}
+          onClick={() => setFormData({ ...formData, gender: "F" })}
+        >
+          여성
+        </GenderButton>
       </GenderRow>
 
-      <NextButton>가입하기</NextButton>
+      <NextButton onClick={onSubmit}>가입하기</NextButton>
     </Form>
   );
 };
