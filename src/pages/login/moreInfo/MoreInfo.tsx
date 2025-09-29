@@ -5,7 +5,9 @@ import Step1Form from "./components/Step1Form";
 import Step2Form from "./components/Step2Form";
 import { FormData } from "../../../types/type";
 import axiosInstance from "../../../apis/axiosInstance";
+import { useNavigate } from "react-router-dom";
 const MoreInfo: React.FC = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -38,8 +40,8 @@ const MoreInfo: React.FC = () => {
     });
 
     if (res.status === 200) {
-      console.log("제출 성공:", res.data);
       alert("회원가입 성공!");
+      navigate('/')
     } else {
       console.log("응답 코드:", res.status);
       alert("회원가입 실패!");
