@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AdminHeader from "../../components/adminHeader/adminHeader";
 import IdSearch from "../../components/adminSearch/adminSearchId";
 import DataTable from "../../components/adminDatatable/adminDatatable";
 import Pagination from "../../components/adminPagination/adminPagination";
@@ -34,8 +33,6 @@ const AdminPost: React.FC = () => {
 
   return (
     <>
-      <AdminHeader active={active} setActive={setActive} />
-
       <Post>
         <IdSearch onIdSelect={setSelectedId} />
       </Post>

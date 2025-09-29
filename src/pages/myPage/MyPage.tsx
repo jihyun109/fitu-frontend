@@ -6,18 +6,17 @@ import {
   SectionTitle,
   ProfileWrapper,
   Button,
-  ModalBackdrop,
-  ModalContent,
-  Row
+  Row,
 } from "./MyPage.styled";
-import Profile from "../../assets/images/anonymous_profile_image2.svg";
+import Profile from "../../assets/images/default_profileImage.png";
 import BodyInput from "./components/BodyInput";
 import ProfileImage from "./components/ProfileImage";
 import ProfileHistory from "./components/ProfileHistory";
 import LineChart from "./components/BodyStatLineChart";
 import Calendar from "./components/Calendar";
 import { format } from "date-fns";
-import { Line } from "recharts";
+import { useNavigate } from "react-router-dom";
+import BackButton from "./components/BackButton";
 
 type WorkoutDetail = {
   name: string;
@@ -33,6 +32,8 @@ type WorkoutRecord = {
 };
 
 export default function MyPage() {
+  // 뒤로가기
+  const navigate = useNavigate();
   // 탭
   const [activeTab, setActiveTab] = useState<"record" | "profile">("record");
 
@@ -46,7 +47,6 @@ export default function MyPage() {
 
   const [profileImg, setProfileImg] = useState<string>(Profile);
   const [showHistory, setShowHistory] = useState(false);
-  const [showChartModal, setShowChartModal] = useState(false);
 
   // 신체 정보 조회
   useEffect(() => {
@@ -139,13 +139,16 @@ export default function MyPage() {
     setRecords([
       {
         date: format(new Date(), "yyyy-MM-dd"),
-        workout: [{ name: "벤치프레스", categoryId: 1, sets: 3, weight: 60, repsPerSet: 10 }],
+        workout: [
+          { name: "벤치프레스", categoryId: 1, sets: 3, weight: 60, repsPerSet: 10 },
+        ],
       },
     ]);
   }, []);
 
   return (
     <MyPageLayout>
+      {/* 상단 탭 */}
       <div
         style={{
           width: "100%",
@@ -155,6 +158,12 @@ export default function MyPage() {
           borderBottom: "1px solid #CED4D8",
         }}
       >
+        <BackButton
+          onClick={() => navigate(-1)}
+          position={{ top: "20px", left: "20px" }}
+          size={15}
+        />
+
         <Button
           onClick={() => setActiveTab("record")}
           style={{
@@ -194,13 +203,6 @@ export default function MyPage() {
             }}
           />
           <Calendar records={records} month={month} onMonthChange={setMonth} />
-          <div
-            style={{
-              width: "100%",
-              height: "10px",
-              backgroundColor: "#F2F4F5",
-            }}
-          />
         </div>
       )}
 
@@ -248,23 +250,9 @@ export default function MyPage() {
                   onChange={inputChange}
                 />
               </Row>
-              <Button
-                onClick={saveLogic}
-                style={{
-                  fontSize: "13px",
-                  width: "45px",
-                  height: "30px",
-                  border: "1px solid #ABB5BD",
-                  borderRadius: "40%",
-                  backgroundColor: "white",
-                  color: "#ABB5BD",
-                  marginBottom: "10px",
-                }}>
-                수정
-              </Button>
             </BodyInfoSection>
 
-            <ProfileWrapper>
+            <ProfileWrapper style={{ position: "relative" }}>
               <ProfileImage
                 viewImage={profileImg}
                 onClick={() => setShowHistory(true)}
@@ -275,52 +263,91 @@ export default function MyPage() {
                   onImageChange={imageChange}
                 />
               )}
+
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 5,
+                  right: -55,
+                  display: "flex",
+                  gap: "13px",
+                  alignItems: "center",
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "2px",
+                    fontSize: "12px",
+                    color: "black",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    id="private"
+                    style={{ color: "#17A1FA" }}
+                  />
+                  프로필 비공개
+                </label>
+
+                <Button
+                  onClick={saveLogic}
+                  style={{
+                    fontSize: "11px",
+                    width: "44px",
+                    height: "22px",
+                    border: "1px solid black",
+                    borderRadius: "40%",
+                    backgroundColor: "white",
+                    color: "black",
+                    marginBottom: "15px",
+                  }}
+                >
+                  수정
+                </Button>
+              </div>
             </ProfileWrapper>
           </TopSection>
-          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}}/>
-          
-          <LineChart />
-          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5"}}/>
 
-          {/* <Button
+          <div
             style={{
-              position: "fixed",
-              bottom: 80,
-              right: 16,
-              backgroundColor: "#17A1FA",
-              color: "black",
-              width: "auto",
-              padding: "12px 20px",
-              borderRadius: "8px",
-              zIndex: 50,
+              width: "100%",
+              height: "10px",
+              backgroundColor: "#F2F4F5",
             }}
-            onClick={() => setShowChartModal(true)}
+          />
+          <LineChart />
+          <div
+            style={{
+              width: "100%",
+              height: "10px",
+              backgroundColor: "#F2F4F5",
+            }}
+          />
+
+          <div
+            style={{
+              width: "100%",
+              height: "60px",
+              backgroundColor: "white",
+              borderBottom: "1px solid #CED4DB",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: "12px",
+              cursor: "pointer",
+            }}
+            role="button"
+            onClick={() => navigate("/invite")}
           >
-            내 몸의 변화보기
-          </Button> */}
-
-          {/* {showChartModal && (
-            <ModalBackdrop>
-              <ModalContent>
-                <Button
-                  style={{
-                    position: "absolute",
-                    top: 12,
-                    right: 12,
-                    background: "none",
-                    border: "none",
-                    fontSize: "1.5rem",
-                    color: "#999",
-                  }}
-                  onClick={() => setShowChartModal(false)}
-                >
-                  ✖
-                </Button>
-                <LineChart />
-              </ModalContent>
-            </ModalBackdrop>
-          )} */}
-
+            친구 초대 코드
+          </div>
+          <div
+            style={{ width: "100%", height: "60px", backgroundColor: "white" }}
+          >
+            <p> &nbsp;&nbsp; 회원 탈퇴 </p>
+          </div>
         </>
       )}
     </MyPageLayout>

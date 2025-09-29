@@ -3,17 +3,19 @@ import styled, { keyframes, css } from "styled-components";
 
 const Login: React.FC = () => {
   const REST_API_KEY = process.env.REACT_APP_REST_API_KEY;
+
   const REDIRECT_URI = "http://localhost:3000/login/oauth";
   const [showContent, setShowContent] = useState(false);
   const link = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 2000);
+
     return () => clearTimeout(timer);
   }, []);
 
   const LoginHandler = () => {
-     window.location.href = link;
+    window.location.href = link;
   };
 
   return (

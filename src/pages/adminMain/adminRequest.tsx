@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import AdminHeader from "../../components/adminHeader/adminHeader";
 import AdminTab, { AdminTabType } from "../../components/adminTab/adminTab";
 import DataTable from "../../components/adminDatatable/adminDatatable";
 import Pagination from "../../components/adminPagination/adminPagination";
@@ -86,7 +85,6 @@ const AdminRequest: React.FC = () => {
 
   return (
     <>
-      <AdminHeader active={active} setActive={setActive} />
       <AdminTab
         activeTab={activeTab}
         setActiveTab={(tab) => {

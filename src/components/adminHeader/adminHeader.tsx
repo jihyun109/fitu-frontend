@@ -1,52 +1,28 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 
-interface AdminHeaderProps {
-  active: "request" | "post" | "member";
-  setActive: React.Dispatch<
-    React.SetStateAction<"request" | "post" | "member">
-  >;
-}
-
-const AdminHeader: React.FC<AdminHeaderProps> = ({ active, setActive }) => {
+const AdminHeader = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleClick = (tab: "request" | "post" | "member") => {
-    setActive(tab);
-    switch (tab) {
-      case "request":
-        navigate("/adminRequest");
-        break;
-      case "post":
-        navigate("/adminPost");
-        break;
-      case "member":
-        navigate("/adminMember");
-        break;
-    }
-  };
+  const tabs = [
+    { key: "request", label: "요청 문의", path: "/admin/request" },
+    { key: "post", label: "게시물 관리", path: "/admin/post" },
+    { key: "member", label: "회원 관리", path: "/admin/member" },
+  ];
+
   return (
     <HeaderContainer>
       <Nav>
-        <NavButton
-          active={active === "request"}
-          onClick={() => handleClick("request")}
-        >
-          요청 문의
-        </NavButton>
-        <NavButton
-          active={active === "post"}
-          onClick={() => handleClick("post")}
-        >
-          게시물 관리
-        </NavButton>
-        <NavButton
-          active={active === "member"}
-          onClick={() => handleClick("member")}
-        >
-          회원 관리
-        </NavButton>
+        {tabs.map((tab) => (
+          <NavButton
+            key={tab.key}
+            active={location.pathname.includes(tab.path)}
+            onClick={() => navigate(tab.path)}
+          >
+            {tab.label}
+          </NavButton>
+        ))}
       </Nav>
     </HeaderContainer>
   );
@@ -56,7 +32,6 @@ export default AdminHeader;
 
 const HeaderContainer = styled.header`
   display: flex;
-  justify-content: space-between;
   padding: 33px 24px;
   margin: 21px 367px;
   align-items: center;

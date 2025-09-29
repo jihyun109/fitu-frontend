@@ -29,6 +29,7 @@ export const Input = styled.input`
   background-color: white;
   color: black;
   border: none;
+  border-bottom: 1px solid #CED4DB;
 `;
 
 export const Unit = styled.span`

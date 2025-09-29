@@ -3,14 +3,16 @@ import styled, { createGlobalStyle } from "styled-components";
 export const CalendarGlobalStyle = createGlobalStyle`
   // 좌우 화살표 색
   .rdp-chevron {
-    fill: black;
+    fill: #909090;
   }
-  
+  .rdp-root {
+    --rdp-accent-color: #007AFF;
+  }
   .rdp-day {
-    width: 48px !important;
-    height: 48px !important;
-    line-height: 48px !important;
-    font-size: 1.1rem;
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 16px;
     text-align: center;
     border-radius: 50%;
   }
@@ -29,7 +31,7 @@ export const CalendarGlobalStyle = createGlobalStyle`
 
   .rdp-caption_label,
   .rdp-head_cell {
-    font-size: 1.2rem;
+    font-size: 18px;
   }
 `;
 
@@ -44,31 +46,31 @@ export const CalendarWrapper = styled.div`
 export const DayPickerWrapper = styled.div`
   width: 100%;
   max-width: 400px;
-  padding: 0 1rem;
 `;
 
 export const WorkoutListWrapper = styled.div`
-  margin-top: 1.5rem;
+  margin-top: 20px;
   width: 100%;
   max-width: 400px;
   background-color: white;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   text-align: center;
 
   p {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    padding-left: 10px;
+    font-weight: bold;
+    font-size: 20px;
+    text-align: left;
   }
 
   ul {
     text-align: left;
-
+    padding-left: 10px;
+    
     li {
-      margin-bottom: 0.25rem;
-      font-size: 0.875rem;
-      color: #4a4a4a;
+      font-size: 16px;
+      color: black;
+      list-style-type: none;
     }
   }
 `;
