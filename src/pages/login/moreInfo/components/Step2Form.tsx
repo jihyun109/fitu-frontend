@@ -9,6 +9,11 @@ interface Step2FormProps {
 }
 
 const Step2Form: React.FC<Step2FormProps> = ({ formData, setFormData, onSubmit }) => {
+const isButtonEnabled =
+  formData.height !== "" &&
+  formData.weight !== "" &&
+  (formData.gender === "M" || formData.gender === "F");
+
   return (
     <Form>
       <Title>신체 정보</Title>
@@ -45,8 +50,8 @@ const Step2Form: React.FC<Step2FormProps> = ({ formData, setFormData, onSubmit }
       <Row>
         <Input
           type="number"
-          value={formData.fat}
-          onChange={(e) => setFormData({ ...formData, fat: e.target.value })}
+          value={formData.bodyFat}
+          onChange={(e) => setFormData({ ...formData, bodyFat: e.target.value })}
         />
         <Unit>%</Unit>
       </Row>
@@ -67,7 +72,9 @@ const Step2Form: React.FC<Step2FormProps> = ({ formData, setFormData, onSubmit }
         </GenderButton>
       </GenderRow>
 
-      <NextButton onClick={onSubmit}>가입하기</NextButton>
+      <NextButton onClick={onSubmit} disabled={!isButtonEnabled}>
+        가입하기
+      </NextButton>
     </Form>
   );
 };
@@ -129,17 +136,18 @@ const GenderButton = styled.button<{ selected?: boolean }>`
   cursor: pointer;
 `;
 
-const NextButton = styled.button`
+const NextButton = styled.button<{ disabled: boolean }>`
   padding: 14px;
   border-radius: 8px;
-  background: #007bff;
+  background: ${({ disabled }) => (disabled ? "#ccc" : "#007bff")};
   color: white;
   border: none;
   position: fixed;
   bottom: 90px;
   left: 50%;
   transform: translateX(-50%);
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   width: calc(100% - 40px);
   max-width: 400px;
+  transition: background 0.3s;
 `;

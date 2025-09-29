@@ -4,16 +4,16 @@ import Header from "./components/Header";
 import Step1Form from "./components/Step1Form";
 import Step2Form from "./components/Step2Form";
 import { FormData } from "../../../types/type";
-
+import axiosInstance from "../../../apis/axiosInstance";
 const MoreInfo: React.FC = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    email: "",
+    universityEmail: "",
     height: "",
     weight: "",
     muscle: "",
-    fat: "",
+    bodyFat: "",
     gender: "M",
   });
 
@@ -25,9 +25,31 @@ const MoreInfo: React.FC = () => {
     if (step < 2) setStep(step + 1);
   };
 
-  const handleSubmit = () => {
-    console.log("최종 제출 데이터:", formData);
-  };
+ const handleSubmit = async () => {
+  try {
+    const res = await axiosInstance.post("/users/info", {
+      name: formData.name,
+      universityEmail: formData.universityEmail,
+      height: formData.height,
+      weight: formData.weight,
+      muscle: formData.muscle,
+      bodyFat: formData.bodyFat,
+      gender: formData.gender,
+    });
+
+    if (res.status === 200) {
+      console.log("제출 성공:", res.data);
+      alert("회원가입 성공!");
+    } else {
+      console.log("응답 코드:", res.status);
+      alert("회원가입 실패!");
+    }
+  } catch (error) {
+    console.error("제출 오류:", error);
+    alert("서버 오류가 발생했습니다.");
+  }
+};
+
 
   return (
     <Wrapper>
