@@ -1,25 +1,94 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import { FormData } from "../../../../types/type";
+import axiosInstance from "../../../../apis/axiosInstance";
 
 interface Step1FormProps {
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   onNext: () => void;
 }
 
-const Step1Form: React.FC<Step1FormProps> = ({ onNext }) => {
+const Step1Form: React.FC<Step1FormProps> = ({
+  formData,
+  setFormData,
+  onNext,
+}) => {
+  const [showVerify, setShowVerify] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verifyCode, setVerifyCode] = useState("");
+
+  const handleVerify = async () => {
+    const email = formData.universityEmail;
+    try {
+      const res = await axiosInstance.post("/auth/email/send", { email });
+      console.log(res);
+      if (res.status === 200) {
+        setShowVerify(true);
+        alert("전송완료! 5분이내 입력해주세요.");
+      } else {
+        alert("유효하지 않은 이메일입니다.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleCheckCode = async () => {
+    try {
+      const res = await axiosInstance.post("/auth/email/verify", {
+        email: formData.universityEmail,
+        code: verifyCode,
+      });
+      if (res.status == 200) {
+        setIsVerified(true);
+        alert("인증완료!")
+      } else {
+        alert("유효하지 않는 인증번호입니다.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const isButtonEnabled = formData.name.trim() !== "" && isVerified;
+
   return (
     <Form>
       <Title>회원 정보</Title>
 
       <Label>성명</Label>
-      <Input type="text" placeholder="이름을 입력하세요" />
+      <Input
+        type="text"
+        placeholder="이름을 입력하세요"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+      />
 
-      <Label style={{marginTop:'85px'}}>학교 이메일</Label>
+      <Label style={{ marginTop: "85px" }}>학교 이메일</Label>
       <InputRow>
-        <Input type="email" placeholder="이메일 입력" />
-        <VerifyButton>인증 요청</VerifyButton>
+        <Input
+          type="email"
+          placeholder="이메일 입력"
+          value={formData.universityEmail}
+          onChange={(e) => setFormData({ ...formData, universityEmail: e.target.value })}
+        />
+        <VerifyButton onClick={handleVerify}>인증 요청</VerifyButton>
       </InputRow>
-
-      <NextButton onClick={onNext}>다음으로</NextButton>
+      {showVerify && (
+        <InputRow className="verify-row">
+          <Input
+            type="text"
+            placeholder="인증번호 입력"
+            value={verifyCode}
+            onChange={(e) => setVerifyCode(e.target.value)}
+          />
+          <VerifyButton type="button" onClick={handleCheckCode} style={{backgroundColor:'white', color:'#007bff'}}>
+            확인
+          </VerifyButton>
+        </InputRow>
+      )}
+      <NextButton onClick={onNext} disabled={!isButtonEnabled}>
+        다음으로
+      </NextButton>
     </Form>
   );
 };
@@ -58,6 +127,9 @@ const InputRow = styled.div`
   display: flex;
   gap: 8px;
   justify-content: space-between;
+  &.verify-row {
+    justify-content: flex-start;
+  }
 `;
 
 const VerifyButton = styled.button`
@@ -66,19 +138,21 @@ const VerifyButton = styled.button`
   background: #f1f1f1;
   border: none;
   cursor: pointer;
+  font-weight: 500;
 `;
 
-const NextButton = styled.button`
+const NextButton = styled.button<{ disabled: boolean }>`
   padding: 14px;
   border-radius: 8px;
-  background: #007bff;
+  background: ${({ disabled }) => (disabled ? "#ccc" : "#007bff")};
   color: white;
   border: none;
   position: fixed;
   bottom: 90px;
   left: 50%;
   transform: translateX(-50%);
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   width: calc(100% - 40px);
   max-width: 400px;
+  transition: background 0.3s;
 `;
