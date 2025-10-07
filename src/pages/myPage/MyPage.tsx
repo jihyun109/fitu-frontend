@@ -17,6 +17,7 @@ import Calendar from "./components/Calendar";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import BackButton from "./components/BackButton";
+import { DeleteAccountModal } from "./components/DeleteAccount";
 
 type WorkoutDetail = {
   name: string;
@@ -47,6 +48,12 @@ export default function MyPage() {
 
   const [profileImg, setProfileImg] = useState<string>(Profile);
   const [showHistory, setShowHistory] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  const handleDeleteConfirm = () => {
+  setShowDeleteModal(false);
+  alert("회원탈퇴 요청 실행 (실제 호출 x)");
+};
 
   // 신체 정보 조회
   useEffect(() => {
@@ -149,15 +156,7 @@ export default function MyPage() {
   return (
     <MyPageLayout>
       {/* 상단 탭 */}
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "40px",
-          borderBottom: "1px solid #CED4D8",
-        }}
-      >
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "40px", borderBottom: "1px solid #CED4D8", }}>
         <BackButton
           onClick={() => navigate(-1)}
           position={{ top: "20px", left: "20px" }}
@@ -345,9 +344,16 @@ export default function MyPage() {
           </div>
           <div
             style={{ width: "100%", height: "60px", backgroundColor: "white" }}
+            role="button"
+            onClick={() => setShowDeleteModal(true)}
           >
             <p> &nbsp;&nbsp; 회원 탈퇴 </p>
           </div>
+          <DeleteAccountModal
+            isOpen={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteConfirm}
+          />
         </>
       )}
     </MyPageLayout>
