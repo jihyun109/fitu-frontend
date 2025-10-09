@@ -310,21 +310,9 @@ export default function MyPage() {
             </ProfileWrapper>
           </TopSection>
 
-          <div
-            style={{
-              width: "100%",
-              height: "10px",
-              backgroundColor: "#F2F4F5",
-            }}
-          />
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5",}} />
           <LineChart />
-          <div
-            style={{
-              width: "100%",
-              height: "10px",
-              backgroundColor: "#F2F4F5",
-            }}
-          />
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5",}} />
 
           <div
             style={{

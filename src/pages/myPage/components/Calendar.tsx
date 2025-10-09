@@ -147,6 +147,7 @@ import {
   DayPickerWrapper,
   WorkoutListWrapper,
 } from "./styles/Calendar.styled";
+import axiosInstance from "../../../apis/axiosInstance";
 
 type WorkoutDetail = {
   name: string;
