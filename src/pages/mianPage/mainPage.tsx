@@ -1,4 +1,3 @@
-// MainPage.tsx
 import styled from "styled-components";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -40,7 +39,6 @@ const MainPage = () => {
                 <div className="date">08.{10 - i} | 홍길동</div>
               </BoardItem>
             ))}
-            {/* 버튼과 겹치지 않게 아래 여백 확보 */}
             <div style={{ height: "50px" }} />
           </BoardList>
 
@@ -56,8 +54,6 @@ const MainPage = () => {
 };
 
 export default MainPage;
-
-// =================== styled-components ===================
 
 const Wrapper = styled.div`
   display: flex;
