@@ -9,7 +9,7 @@ const Header: React.FC<HeaderProps> = ({ name }) => {
     <HeaderWrapper>
       <HeaderItem style={{ justifyContent: "left" }}>{name}</HeaderItem>
       <HeaderItem
-        style={{ fontWeight: "400", fontSize: "40px", color: "#17A1FA" }}
+        style={{ fontWeight: "400", fontSize: "40px", color: "#17A1FA",width:'87px' }}
       >
         FITU
       </HeaderItem>
@@ -23,16 +23,19 @@ export default Header;
 const HeaderWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   max-width: 100%;
-  margin: 10px 30px 0;
+  height: 80px;
+  padding: 0 30px;
+  background-color: white;
   color: #007aff;
   font-weight: bold;
   font-size: 20px;
 `;
 
 const HeaderItem = styled.div`
-  min-width: 100px;
   display: flex;
-  justify-content: center;
-  align-items: end;
+  width: 60px;
+  align-items: center;
 `;
+
