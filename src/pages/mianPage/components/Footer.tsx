@@ -1,24 +1,31 @@
 import styled from "styled-components";
-import MyPageIMG from "../../../assets/images/MyPageIMG.svg";
-import Request from "../../../assets/images/requestIcon.png"
-import Chat from "../../../assets/images/chatIcon.png"
+import Request from "../../../assets/images/requestIcon.png";
+import Chat from "../../../assets/images/chatIcon.png";
+import { useNavigate } from "react-router-dom";
 
 const Footer: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <FooterWrapper>
-      <FooterItem style={{ justifyContent: "left" }}>
-        <img src={Request}/>
+      <FooterItem
+        onClick={() => navigate("/request")}
+        style={{ justifyContent: "left" }}
+      >
+        <img src={Request} />
         <div>요청하기</div>
       </FooterItem>
       <FooterItem
+        onClick={() => navigate("/exercise")}
         style={{ fontWeight: "400", fontSize: "15px", color: "#4B4B4B" }}
       >
         운동하기
       </FooterItem>
-      <FooterItem style={{ justifyContent: "end" }}>
-        <img src={Chat} style={{width:'31px'}}/>
+      <FooterItem
+        onClick={() => navigate("/chatlist")}
+        style={{ justifyContent: "end" }}
+      >
+        <img src={Chat} style={{ width: "31px" }} />
         <div>채팅</div>
-
       </FooterItem>
     </FooterWrapper>
   );
@@ -39,8 +46,8 @@ const FooterItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-    img{
-        width: 28px;
-        height: 28px;
-    }
+  img {
+    width: 28px;
+    height: 28px;
+  }
 `;
