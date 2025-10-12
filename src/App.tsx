@@ -9,7 +9,7 @@ import MyPage from "./pages/myPage/MyPage";
 import { Route, Routes, useLocation } from "react-router-dom";
 import MoreInfo from "./pages/login/moreInfo/MoreInfo";
 import KakaoOauth from "./pages/login/KakaoOauth";
-import MainPage from "./pages/mianPage/mainPage";
+import MainPage from "./pages/mainPage/mainPage";
 import InvitePage from "./pages/myPage/components/InvitePage";
 import CalendarDetail from "./pages/myPage/components/CalendarDetail";
 
