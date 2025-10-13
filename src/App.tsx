@@ -12,7 +12,7 @@ import KakaoOauth from "./pages/login/KakaoOauth";
 import MainPage from "./pages/mianPage/mainPage";
 import InvitePage from "./pages/myPage/components/InvitePage";
 import CalendarDetail from "./pages/myPage/components/CalendarDetail";
-import MainDetail from "./pages/mianPage/components/MainDetail";
+import MainDetail from "./pages/mainDetail/MainDetail";
 
 function App() {
   return (

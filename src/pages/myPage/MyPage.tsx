@@ -16,7 +16,7 @@ import LineChart from "./components/BodyStatLineChart";
 import Calendar from "./components/Calendar";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import BackButton from "./components/BackButton";
+import BackButton from "../../components/BackButton";
 import { DeleteAccountModal } from "./components/DeleteAccount";
 
 type WorkoutDetail = {

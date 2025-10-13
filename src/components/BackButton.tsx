@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Back from "../../../assets/images/Arrow.svg";
+import Back from "../assets/images/Arrow.svg";
 
 interface BackButtonProps {
   onClick?: () => void;

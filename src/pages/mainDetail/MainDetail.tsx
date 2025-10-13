@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { MoreVertical, Send } from "lucide-react";
-import BackButton from "./BackButton";
+import BackButton from "../../components/BackButton";
 import { useNavigate } from "react-router-dom";
-import defImg from "../../../assets/images/default_profileImage.png"
+import defImg from "../../assets/images/default_profileImage.png"
 
 interface Comment {
   id: number;
