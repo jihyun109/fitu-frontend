@@ -22,9 +22,7 @@ export function register(config?: Config) {
       if (isLocalhost) {
         checkValidServiceWorker(swUrl, config);
         navigator.serviceWorker.ready.then(() => {
-          console.log(
-            'This web app is being served cache-first by a service worker.'
-          );
+          console.log('This web app is being served cache-first by a service worker.');
         });
       } else {
         registerValidSW(swUrl, config);
@@ -40,12 +38,20 @@ function registerValidSW(swUrl: string, config?: Config) {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (!installingWorker) return;
+
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller && config?.onUpdate) {
-              config.onUpdate(registration);
-            } else if (config?.onSuccess) {
-              config.onSuccess(registration);
+            if (navigator.serviceWorker.controller) {
+              // 새 버전이 감지되면 즉시 업데이트
+              console.log('New content is available; updating...');
+              if (registration.waiting) {
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              }
+              window.location.reload(); // 자동 새로고침
+              config?.onUpdate?.(registration);
+            } else {
+              console.log('Content is cached for offline use.');
+              config?.onSuccess?.(registration);
             }
           }
         };
