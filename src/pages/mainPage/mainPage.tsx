@@ -2,21 +2,27 @@ import styled from "styled-components";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { Search, Pencil } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import ArrowDown from "../../assets/images/ArrowDown.png";
 
 const MainPage = () => {
+  const navigate = useNavigate();
   let name = "한세대";
+
+  const handleCardClick = (type: string) => {
+    navigate(`medal/${type}`);
+  };
 
   return (
     <Wrapper>
       <Header name={name} />
-
       <MainContent>
         <CardContainer>
-          <Card>
+          <Card onClick={() => handleCardClick("3대500")}>
             <div className="title">3대500 🏅</div>
             <div className="sub">자세히 &gt;</div>
           </Card>
-          <Card>
+          <Card onClick={() => handleCardClick("규칙적운동")}>
             <div className="title">규칙적 운동 🏅</div>
             <div className="sub">자세히 &gt;</div>
           </Card>
@@ -28,7 +34,10 @@ const MainPage = () => {
         </SearchBar>
 
         <Board>
-          <BoardHeader>자유게시판 ⌄</BoardHeader>
+          <BoardHeader>
+            <img src={ArrowDown} />
+            자유게시판
+          </BoardHeader>
           <BoardList>
             {Array.from({ length: 30 }).map((_, i) => (
               <BoardItem key={i}>
@@ -123,17 +132,27 @@ const Board = styled.div`
   flex: 1;
   background: white;
   border-radius: 12px;
-  padding: 10px 0 10px; 
+  padding: 10px 0 10px;
   display: flex;
   flex-direction: column;
-  min-height: 0; 
+  min-height: 0;
 `;
 
 const BoardHeader = styled.div`
   font-weight: 600;
   font-size: 15px;
-  padding: 0 12px 8px;
-  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid #f2f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 127px;
+  height: 27px;
+  margin: 0 0 10px 12px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+  img {
+    padding-right: 5px;
+  }
 `;
 
 const BoardList = styled.div`
@@ -142,8 +161,9 @@ const BoardList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 0 12px;
+  padding: 8px 12px 0;
   min-height: 0;
+  border-top: 1px solid #eee;
 `;
 
 const BoardItem = styled.div`
