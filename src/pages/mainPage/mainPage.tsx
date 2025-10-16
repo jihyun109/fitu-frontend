@@ -4,18 +4,76 @@ import Footer from "./components/Footer";
 import { Search, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ArrowDown from "../../assets/images/ArrowDown.png";
+import { useEffect, useState } from "react";
+import axiosInstance from "../../apis/axiosInstance";
+
+interface Post {
+  id: number;
+  universityName: string;
+  category: string;
+  title: string;
+  contents: string;
+  createdAt: string;
+}
 
 const MainPage = () => {
   const navigate = useNavigate();
-  let name = "한세대";
+  const [uniName, setUniName] = useState("한세대");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [category, setCategory] = useState<"FREE_BOARD" | "WORKOUT_INFO" | "WORKOUT_MATE">("FREE_BOARD");
+
+  const fetchPosts = async (pageNum: number, selectedCategory = category) => {
+    if (isLoading || (!hasNext && pageNum !== 0)) return;
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.get("/api/v2/posts", {
+        params: {
+          category: selectedCategory,
+          page: pageNum,
+        },
+      });
+      const data = res.data;
+      if (pageNum === 0) {
+        setPosts(data.content);
+      } else {
+        setPosts((prev) => [...prev, ...data.content]);
+      }
+      setHasNext(data.hasNext);
+    } catch (err) {
+      console.error("게시글 불러오기 실패:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts(0);
+  }, []);
+
+  const handleLoadMore = () => {
+    fetchPosts(page + 1);
+    setPage((prev) => prev + 1);
+  };
 
   const handleCardClick = (type: string) => {
     navigate(`medal/${type}`);
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCategory = e.target.value as "FREE_BOARD" | "WORKOUT_INFO" | "WORKOUT_MATE";
+    setCategory(newCategory);
+    setPage(0);
+    setPosts([]);
+    setHasNext(true);
+    fetchPosts(0, newCategory);
+  };
+
   return (
     <Wrapper>
-      <Header name={name} />
+      <Header name={uniName} />
       <MainContent>
         <CardContainer>
           <Card onClick={() => handleCardClick("3대500")}>
@@ -35,20 +93,30 @@ const MainPage = () => {
 
         <Board>
           <BoardHeader>
-            <img src={ArrowDown} />
-            자유게시판
+            <img src={ArrowDown} alt="dropdown" />
+            <select value={category} onChange={handleCategoryChange}>
+              <option value="FREE_BOARD">자유게시판</option>
+              <option value="WORKOUT_INFO">정보게시판</option>
+              <option value="WORKOUT_MATE">메이트게시판</option>
+            </select>
           </BoardHeader>
+
           <BoardList>
-            {Array.from({ length: 30 }).map((_, i) => (
-              <BoardItem key={i}>
-                <div className="title">가나다라마바사</div>
-                <div className="content">
-                  아자차카타파하가나다라마바사아자차카타파하가나다라마바사
+            {posts.map((post) => (
+              <BoardItem key={post.id}>
+                <div className="title">{post.title}</div>
+                <div className="content">{post.contents}</div>
+                <div className="date">
+                  {new Date(post.createdAt).toLocaleDateString("ko-KR")} | {post.universityName}
                 </div>
-                <div className="date">08.{10 - i} | 홍길동</div>
               </BoardItem>
             ))}
-            <div style={{ height: "50px" }} />
+
+            {isLoading && <LoadingText>불러오는 중...</LoadingText>}
+
+            {!isLoading && hasNext && (
+              <LoadMoreButton onClick={handleLoadMore}>더보기</LoadMoreButton>
+            )}
           </BoardList>
 
           <WriteButton>
@@ -56,7 +124,6 @@ const MainPage = () => {
           </WriteButton>
         </Board>
       </MainContent>
-
       <Footer />
     </Wrapper>
   );
@@ -153,6 +220,18 @@ const BoardHeader = styled.div`
   img {
     padding-right: 5px;
   }
+    select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: #333;
+  }
 `;
 
 const BoardList = styled.div`
@@ -202,4 +281,27 @@ const WriteButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+`;
+
+const LoadingText = styled.div`
+  text-align: center;
+  font-size: 13px;
+  color: #777;
+  margin: 12px 0;
+`;
+
+
+const LoadMoreButton = styled.button`
+  margin: 12px auto;
+  padding: 8px 16px;
+  border: none;
+  background-color: #e9f5ff;
+  color: #17a1fa;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  &:hover {
+    background-color: #d9efff;
+  }
 `;
