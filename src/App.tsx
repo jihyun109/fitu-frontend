@@ -32,7 +32,7 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path='/invite' element={<InvitePage/>}/>
         <Route path="/record/:date" element={<CalendarDetail />} />
-        <Route path="/home/D" element={<MainDetail />} />
+        <Route path="/home/detail/:id" element={<MainDetail />} />
       </Routes>
     </div>
   );
