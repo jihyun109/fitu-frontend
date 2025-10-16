@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import BackButton from "./BackButton";
+import BackButton from "../../../components/BackButton";
 import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`

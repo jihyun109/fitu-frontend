@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import BackButton from "./BackButton";
+import BackButton from "../../../components/BackButton";
 import styled from "styled-components";
 import { useLocation, useParams } from "react-router-dom";
 

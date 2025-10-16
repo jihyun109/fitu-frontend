@@ -12,6 +12,7 @@ import KakaoOauth from "./pages/login/KakaoOauth";
 import MainPage from "./pages/mainPage/mainPage";
 import InvitePage from "./pages/myPage/components/InvitePage";
 import CalendarDetail from "./pages/myPage/components/CalendarDetail";
+import MainDetail from "./pages/mainDetail/MainDetail";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path='/invite' element={<InvitePage/>}/>
         <Route path="/record/:date" element={<CalendarDetail />} />
+        <Route path="/home/D" element={<MainDetail />} />
       </Routes>
     </div>
   );
