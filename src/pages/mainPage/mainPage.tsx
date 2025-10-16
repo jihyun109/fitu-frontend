@@ -71,6 +71,10 @@ const MainPage = () => {
     fetchPosts(0, newCategory);
   };
 
+  const handlePostClick = (id: number) => {
+    navigate(`/home/detail/${id}`);
+  };
+
   return (
     <Wrapper>
       <Header name={uniName} />
@@ -103,7 +107,7 @@ const MainPage = () => {
 
           <BoardList>
             {posts.map((post) => (
-              <BoardItem key={post.id}>
+              <BoardItem key={post.id} onClick={()=>handlePostClick(post.id)}>
                 <div className="title">{post.title}</div>
                 <div className="content">{post.contents}</div>
                 <div className="date">
