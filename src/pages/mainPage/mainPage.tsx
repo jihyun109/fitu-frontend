@@ -23,24 +23,27 @@ const MainPage = () => {
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [category, setCategory] = useState<"FREE_BOARD" | "WORKOUT_INFO" | "WORKOUT_MATE">("FREE_BOARD");
+  const [category, setCategory] = useState<
+    "FREE_BOARD" | "WORKOUT_INFO" | "WORKOUT_MATE"
+  >("FREE_BOARD");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const options = [
+    { value: "FREE_BOARD", label: "자유게시판" },
+    { value: "WORKOUT_INFO", label: "정보게시판" },
+    { value: "WORKOUT_MATE", label: "메이트게시판" },
+  ];
 
   const fetchPosts = async (pageNum: number, selectedCategory = category) => {
     if (isLoading || (!hasNext && pageNum !== 0)) return;
     setIsLoading(true);
     try {
       const res = await axiosInstance.get("/api/v2/posts", {
-        params: {
-          category: selectedCategory,
-          page: pageNum,
-        },
+        params: { category: selectedCategory, page: pageNum },
       });
       const data = res.data;
-      if (pageNum === 0) {
-        setPosts(data.content);
-      } else {
-        setPosts((prev) => [...prev, ...data.content]);
-      }
+      if (pageNum === 0) setPosts(data.content);
+      else setPosts((prev) => [...prev, ...data.content]);
       setHasNext(data.hasNext);
     } catch (err) {
       console.error("게시글 불러오기 실패:", err);
@@ -58,21 +61,53 @@ const MainPage = () => {
     setPage((prev) => prev + 1);
   };
 
-  const handleCardClick = (type: string) => {
-    navigate(`medal/${type}`);
-  };
+  const handleCardClick = (type: string) => navigate(`medal/${type}`);
+  const handlePostClick = (id: number) => navigate(`/home/detail/${id}`);
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCategory = e.target.value as "FREE_BOARD" | "WORKOUT_INFO" | "WORKOUT_MATE";
-    setCategory(newCategory);
+  const handleCategorySelect = (value: typeof category) => {
+    setCategory(value);
+    setDropdownOpen(false);
     setPage(0);
     setPosts([]);
     setHasNext(true);
-    fetchPosts(0, newCategory);
+    fetchPosts(0, value);
   };
 
-  const handlePostClick = (id: number) => {
-    navigate(`/home/detail/${id}`);
+  const fetchSearchPosts = async (
+    keyword: string,
+    pageNum: number = 0,
+    selectedCategory = category
+  ) => {
+    if (isLoading || (!hasNext && pageNum !== 0)) return;
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.get("/api/v2/posts/search", {
+        params: {
+          category: selectedCategory,
+          keyword,
+          page: pageNum,
+          size: 20,
+        },
+      });
+      const data = res.data;
+      if (pageNum === 0) setPosts(data.content);
+      else setPosts((prev) => [...prev, ...data.content]);
+      setHasNext(data.hasNext);
+    } catch (err) {
+      console.error("검색 실패:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    setPage(0);
+    setHasNext(true);
+    fetchSearchPosts(searchKeyword, 0, category);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value);
   };
 
   return (
@@ -91,33 +126,51 @@ const MainPage = () => {
         </CardContainer>
 
         <SearchBar>
-          <Search size={18} color="#A0A0A0" />
-          <input type="text" placeholder="검색어를 입력해주세요." />
+          <Search
+            size={18}
+            color="#A0A0A0"
+            onClick={() => handleSearchSubmit()}
+          />
+          <input
+            type="text"
+            placeholder="검색어를 입력해주세요."
+            value={searchKeyword}
+            onChange={handleSearchChange}
+          />
         </SearchBar>
 
         <Board>
-          <BoardHeader>
-            <img src={ArrowDown} alt="dropdown" />
-            <select value={category} onChange={handleCategoryChange}>
-              <option value="FREE_BOARD">자유게시판</option>
-              <option value="WORKOUT_INFO">정보게시판</option>
-              <option value="WORKOUT_MATE">메이트게시판</option>
-            </select>
-          </BoardHeader>
+          <BoardHeaderContainer>
+            <BoardHeader onClick={() => setDropdownOpen((prev) => !prev)}>
+              <img src={ArrowDown} alt="dropdown" />
+              {options.find((opt) => opt.value === category)?.label}
+            </BoardHeader>
+            <DropdownList open={dropdownOpen}>
+              {options.map((opt) => (
+                <DropdownItem
+                  key={opt.value}
+                  onClick={() =>
+                    handleCategorySelect(opt.value as typeof category)
+                  }
+                >
+                  {opt.label}
+                </DropdownItem>
+              ))}
+            </DropdownList>
+          </BoardHeaderContainer>
 
           <BoardList>
             {posts.map((post) => (
-              <BoardItem key={post.id} onClick={()=>handlePostClick(post.id)}>
+              <BoardItem key={post.id} onClick={() => handlePostClick(post.id)}>
                 <div className="title">{post.title}</div>
                 <div className="content">{post.contents}</div>
                 <div className="date">
-                  {new Date(post.createdAt).toLocaleDateString("ko-KR")} | {post.universityName}
+                  {new Date(post.createdAt).toLocaleDateString("ko-KR")} |{" "}
+                  {post.universityName}
                 </div>
               </BoardItem>
             ))}
-
             {isLoading && <LoadingText>불러오는 중...</LoadingText>}
-
             {!isLoading && hasNext && (
               <LoadMoreButton onClick={handleLoadMore}>더보기</LoadMoreButton>
             )}
@@ -209,6 +262,12 @@ const Board = styled.div`
   min-height: 0;
 `;
 
+const BoardHeaderContainer = styled.div`
+  position: relative;
+  max-width: 124px;
+  margin: 0 0 10px 12px;
+`;
+
 const BoardHeader = styled.div`
   font-weight: 600;
   font-size: 15px;
@@ -217,24 +276,43 @@ const BoardHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 127px;
-  height: 27px;
-  margin: 0 0 10px 12px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+  height: 32px;
+  gap: 10px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+
   img {
-    padding-right: 5px;
+    width: 12px;
+    margin-left: 5px;
   }
-    select {
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    color: #333;
+`;
+
+const DropdownList = styled.ul<{ open: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #f2f4f6;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: ${({ open }) => (open ? "block" : "none")};
+  z-index: 10;
+`;
+
+const DropdownItem = styled.li`
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+
+  &:hover {
+    background: #f2f4f6;
   }
 `;
 
@@ -293,7 +371,6 @@ const LoadingText = styled.div`
   color: #777;
   margin: 12px 0;
 `;
-
 
 const LoadMoreButton = styled.button`
   margin: 12px auto;
