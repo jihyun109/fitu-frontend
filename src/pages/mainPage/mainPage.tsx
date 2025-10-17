@@ -9,7 +9,7 @@ import axiosInstance from "../../apis/axiosInstance";
 
 interface Post {
   id: number;
-  universityName: string;
+  writerName: string;
   category: string;
   title: string;
   contents: string;
@@ -18,7 +18,7 @@ interface Post {
 
 const MainPage = () => {
   const navigate = useNavigate();
-  const [uniName, setUniName] = useState("한세대");
+  const [uniName, setUniName] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(0);
   const [hasNext, setHasNext] = useState(true);
@@ -42,6 +42,7 @@ const MainPage = () => {
         params: { category: selectedCategory, page: pageNum },
       });
       const data = res.data;
+      setUniName(res.data.universityName)
       if (pageNum === 0) setPosts(data.content);
       else setPosts((prev) => [...prev, ...data.content]);
       setHasNext(data.hasNext);
@@ -166,7 +167,7 @@ const MainPage = () => {
                 <div className="content">{post.contents}</div>
                 <div className="date">
                   {new Date(post.createdAt).toLocaleDateString("ko-KR")} |{" "}
-                  {post.universityName}
+                  {post.writerName}
                 </div>
               </BoardItem>
             ))}
