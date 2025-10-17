@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import BackButton from "../../../components/BackButton";
-import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   padding: 24px;
@@ -13,6 +12,7 @@ const Section = styled.div`
   background-color: white;
   padding: 16px;
   border-radius: 8px;
+  margin-top: 15%;
   margin-bottom: 24px;
 `;
 const Section2 = styled.div`
@@ -57,27 +57,26 @@ const Button = styled.button`
   }
 `;
 
-const Header = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  position: relative;
-  height: 60px;
-  background-color: white;
-`;
+// const Header = styled.div`
+//   width: 100%;
+//   display: flex;
+//   align-items: center;
+//   position: relative;
+//   height: 60px;
+//   background-color: white;
+// `;
 
-const HeaderTitle = styled.div`
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-weight: 600;
-  font-size: 16px;
-`;
+// const HeaderTitle = styled.div`
+//   position: absolute;
+//   left: 50%;
+//   transform: translateX(-50%);
+//   font-weight: 600;
+//   font-size: 16px;
+// `;
 
 export default function InvitePage() {
-  const [myCode, setMyCode] = useState("ABC1DEF"); // 서버에서 가져오도록 구현 필요
+  const [myCode] = useState("ABC1DEF"); // 서버에서 가져오도록 구현 필요
   const [friendCode, setFriendCode] = useState("");
-  const navigate = useNavigate();
 
   const copyCode = () => {
     navigator.clipboard.writeText(myCode);
@@ -93,14 +92,10 @@ export default function InvitePage() {
 
   return (
     <Container>
-      <Header>
-        <BackButton
-          onClick={() => navigate(-1)}
-          position={{ top: "20px", left: "20px" }}
-          size={15}
-        />
-        <HeaderTitle>친구 초대 코드</HeaderTitle>
-      </Header>
+      {/* <Header> */}
+        <BackButton>친구 초대 코드</BackButton>
+        {/* <HeaderTitle>친구 초대 코드</HeaderTitle> */}
+      {/* </Header> */}
 
       <Section>
         <Title>

@@ -157,11 +157,7 @@ export default function MyPage() {
     <MyPageLayout>
       {/* 상단 탭 */}
       <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "40px", borderBottom: "1px solid #CED4D8", }}>
-        <BackButton
-          onClick={() => navigate(-1)}
-          position={{ top: "20px", left: "20px" }}
-          size={15}
-        />
+        <BackButton />
 
         <Button
           onClick={() => setActiveTab("record")}
