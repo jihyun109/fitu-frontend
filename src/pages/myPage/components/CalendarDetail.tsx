@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import BackButton from "../../../components/BackButton";
 import styled from "styled-components";
 import { useLocation, useParams } from "react-router-dom";
@@ -18,16 +17,7 @@ const Header = styled.div`
   border-bottom: 1px solid #CED4DB;
 `;
 
-const Title = styled.h2`
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-weight: 600;
-  font-size: 16px;
-`;
-
 export default function CalendarDetail() {
-  const navigate = useNavigate();
     const { date } = useParams();
     const location = useLocation();
     const workout = location.state?.workout;
@@ -35,12 +25,7 @@ export default function CalendarDetail() {
   return (
     <Container>
       <Header>
-        <BackButton
-          onClick={() => navigate(-1)}
-          position={{ top: "18px", left: "16px" }}
-          size={20}
-        />
-        <Title>{date} 운동</Title>
+        <BackButton>{date} 운동</BackButton>
       </Header>
       <div style={{ padding: "20px" }}>
         <p>운동명: {workout.name}</p>
