@@ -62,7 +62,7 @@ const MainPage = () => {
     setPage((prev) => prev + 1);
   };
 
-  const handleCardClick = (type: string) => navigate(`medal/${type}`);
+  const handleCardClick = (type: string) => navigate(`medal/?type=${type}`);
   const handlePostClick = (id: number) => navigate(`/home/detail/${id}`);
 
   const handleCategorySelect = (value: typeof category) => {
