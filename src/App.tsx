@@ -13,7 +13,7 @@ import MainPage from "./pages/mainPage/mainPage";
 import InvitePage from "./pages/myPage/components/InvitePage";
 import CalendarDetail from "./pages/myPage/components/CalendarDetail";
 import MainDetail from "./pages/mainDetail/MainDetail";
-
+import Medal from "./pages/medalPage/Medal";
 function App() {
   return (
     <div className="App">
@@ -33,6 +33,8 @@ function App() {
         <Route path='/invite' element={<InvitePage/>}/>
         <Route path="/record/:date" element={<CalendarDetail />} />
         <Route path="/home/detail/:id" element={<MainDetail />} />
+        <Route path="/home/medal" element={<Medal/>} />
+
       </Routes>
     </div>
   );
