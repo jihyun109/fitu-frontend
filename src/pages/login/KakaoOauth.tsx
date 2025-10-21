@@ -19,7 +19,7 @@ const KakaoOauth = () => {
           sessionStorage.setItem("Authorization", jwtToken);
 
           if (response.status === 201) {
-            navigate("/signup");
+            navigate("/home");
           } else if (response.status === 200) {
             navigate("/home");
           }
