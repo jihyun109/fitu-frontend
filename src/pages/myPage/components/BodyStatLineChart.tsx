@@ -55,7 +55,7 @@ export default function BodyStatLineChart() {
       const endDate = dayjs().format("YYYY-MM-DD");
 
       try {
-        const url = `https://hanseifitu.shop/physical-infos/muscle-bodyfat?startDate=${startDate}&endDate=${endDate}`;
+        const url = `https://hanseifitu.shop/api/v2/physical-infos/muscle-bodyfat?startDate=${startDate}&endDate=${endDate}`;
 
         const res = await fetch(url, {
           headers: {

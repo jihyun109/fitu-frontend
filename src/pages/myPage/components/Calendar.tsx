@@ -47,11 +47,6 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
 
         const response = await axiosInstance.get(
           `/api/workout/calendar/full?year=${year}&month=${monthParam}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
         );
 
         const data = response.data;

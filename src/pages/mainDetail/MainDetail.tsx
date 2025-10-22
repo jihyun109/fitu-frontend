@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { MoreVertical, Send } from "lucide-react";
 import BackButton from "../../components/BackButton";
-import { useNavigate } from "react-router-dom";
 import defImg from "../../assets/images/default_profileImage.png"
 
 interface Comment {
@@ -13,7 +12,6 @@ interface Comment {
 }
 
 const MainDetail = () => {
-    const navigate = useNavigate();
     const comments: Comment[] = [
         { id: 1, author: "김주민", content: "한국어 연습중이야?", date: "08/12 20:05" },
         { id: 2, author: "김주민", content: "퉁퉁퉁퉁퉁퉁사후르", date: "08/12 20:08" },
@@ -23,12 +21,7 @@ const MainDetail = () => {
   return (
     <Wrapper>
       <Header>
-        <BackButton
-          onClick={() => navigate(-1)}
-          position={{ top: "20px", left: "20px" }}
-          size={15}
-        />
-        <Title>자유게시판</Title>
+        <BackButton>자유게시판</BackButton>
       </Header>
 
       <ContentWrapper>
@@ -102,12 +95,6 @@ const Header = styled.div`
   font-weight: 600;
   border-bottom: 1px solid #D9D9D9;
 
-`;
-
-const Title = styled.div`
-  font-size: 20px;
-  margin-left: 40%;
-  font-weight: bold;
 `;
 
 const ContentWrapper = styled.div`

@@ -93,7 +93,9 @@ export default function InvitePage() {
   return (
     <Container>
       {/* <Header> */}
+      
         <BackButton>친구 초대 코드</BackButton>
+
         {/* <HeaderTitle>친구 초대 코드</HeaderTitle> */}
       {/* </Header> */}
 

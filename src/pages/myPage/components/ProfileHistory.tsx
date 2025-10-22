@@ -26,7 +26,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       if (!token) return;
 
       try {
-        const res = await fetch(`${API_BASE}/body-image/history`, {
+        const res = await fetch(`${API_BASE}/api/v2/profile-image/history`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -71,7 +71,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       const formData = new FormData();
       formData.append("image", blob, "profile.jpg");
 
-      const res = await fetch(`${API_BASE}/body-image`, {
+      const res = await fetch(`${API_BASE}/api/v2/profile-image`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -99,7 +99,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
     if (!token) return;
 
     try {
-      const res = await fetch(`${API_BASE}/body-image`, {
+      const res = await fetch(`${API_BASE}/api/v2/profile-image`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
