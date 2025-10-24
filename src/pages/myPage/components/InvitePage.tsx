@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import BackButton from "../../../components/BackButton";
+import axiosInstance from "../../../apis/axiosInstance";
 
 const Container = styled.div`
   padding: 24px;
@@ -15,8 +16,9 @@ const Section = styled.div`
   margin-top: 15%;
   margin-bottom: 24px;
 `;
+
 const Section2 = styled.div`
-  background-color: #F8F8F8;
+  background-color: #f8f8f8;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -45,7 +47,7 @@ const Input = styled.input`
 const Button = styled.button`
   padding: 8px 16px;
   margin-left: 8px;
-  background-color: #007AFF;
+  background-color: #007aff;
   color: white;
   border: none;
   border-radius: 8px;
@@ -57,47 +59,45 @@ const Button = styled.button`
   }
 `;
 
-// const Header = styled.div`
-//   width: 100%;
-//   display: flex;
-//   align-items: center;
-//   position: relative;
-//   height: 60px;
-//   background-color: white;
-// `;
-
-// const HeaderTitle = styled.div`
-//   position: absolute;
-//   left: 50%;
-//   transform: translateX(-50%);
-//   font-weight: 600;
-//   font-size: 16px;
-// `;
-
 export default function InvitePage() {
-  const [myCode] = useState("ABC1DEF"); // 서버에서 가져오도록 구현 필요
-  const [friendCode, setFriendCode] = useState("");
+  const [myCode, setMyCode] = useState<string>("");
+  const [friendCode, setFriendCode] = useState<string>("");
+
+  useEffect(() => {
+    const fetchMyCode = async () => {
+      try {
+        const res = await axiosInstance.get("/api/v2/users/friend-code");
+        setMyCode(res.data.friendCode || "");
+      } catch (err) {
+        console.error("초대 코드 불러오기 실패:", err);
+        alert("초대 코드를 불러오지 못했습니다.");
+      }
+    };
+
+    fetchMyCode();
+  }, []);
 
   const copyCode = () => {
+    if (!myCode) return alert("초대 코드가 없습니다.");
     navigator.clipboard.writeText(myCode);
     alert("초대 코드가 복사되었습니다!");
   };
 
-  const addFriendCode = () => {
-    if (!friendCode) return alert("코드를 입력하세요.");
-    // 서버로 POST 요청
-    alert(`친구 초대 코드 ${friendCode} 추가 요청`);
-    setFriendCode("");
+  const addFriendCode = async () => {
+    if (!friendCode.trim()) return alert("코드를 입력하세요.");
+
+    try {
+      alert(`친구 초대 코드 ${friendCode} 추가 요청`);
+      setFriendCode("");
+    } catch (err) {
+      console.error("친구 추가 에러:", err);
+      alert("친구 초대에 실패했습니다.");
+    }
   };
 
   return (
     <Container>
-      {/* <Header> */}
-      
-        <BackButton>친구 초대 코드</BackButton>
-
-        {/* <HeaderTitle>친구 초대 코드</HeaderTitle> */}
-      {/* </Header> */}
+      <BackButton>친구 초대 코드</BackButton>
 
       <Section>
         <Title>
@@ -120,7 +120,7 @@ export default function InvitePage() {
 
       <Section2>
         <Title>나의 초대 코드</Title>
-        <CodeBox>{myCode}</CodeBox>
+        <CodeBox>{myCode || "로딩 중..."}</CodeBox>
         <Button onClick={copyCode}>복사</Button>
       </Section2>
     </Container>

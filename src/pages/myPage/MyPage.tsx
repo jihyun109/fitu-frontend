@@ -33,17 +33,14 @@ type WorkoutRecord = {
 };
 
 export default function MyPage() {
-  // 뒤로가기
   const navigate = useNavigate();
-  // 탭
   const [activeTab, setActiveTab] = useState<"record" | "profile">("record");
-
-  // 프로필
   const [bodyData, setBodyData] = useState({
     height: "",
     weight: "",
     muscle: "",
     bodyFat: "",
+    userName: "",
   });
 
   const [profileImg, setProfileImg] = useState<string>(Profile);
@@ -55,7 +52,6 @@ export default function MyPage() {
   alert("회원탈퇴 요청 실행 (실제 호출 x)");
 };
 
-  // 신체 정보 조회
   useEffect(() => {
     const recentBodyData = async () => {
       const token = sessionStorage.getItem("Authorization");
@@ -72,6 +68,7 @@ export default function MyPage() {
           weight: data.weight?.toString() || "",
           muscle: data.muscle?.toString() || "",
           bodyFat: data.bodyFat?.toString() || "",
+          userName: data.userName || "",
         });
       } catch (error) {
         console.error("신체 정보 조회 에러:", error);
@@ -114,7 +111,6 @@ export default function MyPage() {
     }
   };
 
-  // 프로필 이미지 최신화
   useEffect(() => {
     const latestProfile = async () => {
       const token = sessionStorage.getItem("Authorization");
@@ -137,11 +133,9 @@ export default function MyPage() {
 
   const imageChange = (newImage: string) => setProfileImg(newImage);
 
-  // 기록(캘린더)
   const [month, setMonth] = useState<Date>(new Date());
   const [records, setRecords] = useState<WorkoutRecord[]>([]);
 
-  // 로그인 연동 되면은 캘린더 쪽 API 연동 해야함
   useEffect(() => {
     setRecords([
       {
@@ -155,7 +149,6 @@ export default function MyPage() {
 
   return (
     <MyPageLayout>
-      {/* 상단 탭 */}
       <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "40px", borderBottom: "1px solid #CED4D8", }}>
         <BackButton />
 
@@ -186,8 +179,7 @@ export default function MyPage() {
           프로필
         </Button>
       </div>
-
-      {/* 탭 내용 */}
+      
       {activeTab === "record" && (
         <div>
           <div
@@ -212,7 +204,7 @@ export default function MyPage() {
           />
           <TopSection>
             <BodyInfoSection>
-              <SectionTitle>김주민</SectionTitle>
+              <SectionTitle>{bodyData.userName || "사용자 이름 손실"}</SectionTitle>
               <Row>
                 <BodyInput
                   name="키"
