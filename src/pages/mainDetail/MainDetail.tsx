@@ -1,23 +1,138 @@
-import React from "react";
-import styled from "styled-components";
-import { MoreVertical, Send } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Send } from "lucide-react";
+import { useParams, useLocation } from "react-router-dom";
 import BackButton from "../../components/BackButton";
-import defImg from "../../assets/images/default_profileImage.png"
+import axiosInstance from "../../apis/axiosInstance";
+import DetailComment from "./DetailComment";
+import {
+  Wrapper,
+  Header,
+  ContentWrapper,
+  Post,
+  UserInfo,
+  ProfileImage,
+  PostText,
+  CommentList,
+  CommentInput,
+} from "./mainDetail.styles";
+import defImg from "../../assets/images/default_profileImage.png";
 
-interface Comment {
+interface PostData {
   id: number;
-  author: string;
-  content: string;
-  date: string;
+  postCategory: string;
+  title: string;
+  writerName: string;
+  writerProfileImgUrl: string;
+  contents: string;
+  createdAt: string;
 }
 
-const MainDetail = () => {
-    const comments: Comment[] = [
-        { id: 1, author: "김주민", content: "한국어 연습중이야?", date: "08/12 20:05" },
-        { id: 2, author: "김주민", content: "퉁퉁퉁퉁퉁퉁사후르", date: "08/12 20:08" },
-        { id: 3, author: "김주민", content: "아아아아아아아아아아아앙아ㅏ", date: "08/12 20:10" },
-        { id: 4, author: "김주민", content: "가나다라마바사아자차카타파하", date: "08/12 20:12" },
-    ];
+interface CommentData {
+  id: number;
+  writerName: string;
+  writerProfileImgUrl: string;
+  rootId: number;
+  contents: string;
+  createdAt: string;
+  isMine: boolean;
+  isSecret: boolean;
+  replies: CommentData[];
+}
+
+interface PostDetailResponse {
+  post: PostData;
+  comments: CommentData[];
+}
+
+const MainDetail: React.FC = () => {
+  const params = useParams<{ postId: string }>();
+  const location = useLocation();
+  const paramPostId = params.postId;
+
+  const [post, setPost] = useState<PostData | null>(null);
+  const [comments, setComments] = useState<CommentData[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [replyTarget, setReplyTarget] = useState<number | null>(null);
+  const [isSecret, setIsSecret] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const resolvePostId = (): string | null => {
+    if (paramPostId) return paramPostId;
+    const m = location.pathname.match(/\/(\d+)(?:\/?$)/);
+    if (m && m[1]) return m[1];
+    const urlSearch = new URLSearchParams(location.search);
+    return urlSearch.get("postId") ?? urlSearch.get("id");
+  };
+
+  const fetchPostDetail = async (idStr: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${idStr}`);
+      setPost(res.data.post);
+      setComments(res.data.comments ?? []);
+    } catch (err) {
+      console.error(err);
+      setError("게시글을 불러오지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const idResolved = resolvePostId();
+    if (!idResolved) {
+      setError("잘못된 게시물 주소입니다.");
+      setLoading(false);
+      return;
+    }
+    fetchPostDetail(idResolved);
+  }, [location.pathname, location.search, paramPostId]);
+
+  const handleCommentSubmit = async () => {
+    const idResolved = resolvePostId();
+    if (!idResolved || !newComment.trim()) return;
+
+    try {
+      const res = await axiosInstance.post<CommentData>(
+        `/api/v2/posts/${idResolved}/comments`,
+        {
+          contents: newComment,
+          rootId: replyTarget ?? 0,
+          isSecret,
+        }
+      );
+
+      const newCommentData = res.data;
+
+      // 새 댓글 상태에 반영
+      setComments(prev => {
+        if (replyTarget) {
+          // 답글인 경우
+          return prev.map(c =>
+            c.id === replyTarget
+              ? { ...c, replies: [...c.replies, newCommentData] }
+              : c
+          );
+        }
+        // 새 댓글인 경우
+        return [...prev, newCommentData];
+      });
+
+      setNewComment("");
+      setReplyTarget(null);
+      setIsSecret(false);
+    } catch (err) {
+      console.error(err);
+      alert("댓글 작성에 실패했습니다.");
+    }
+  };
+
+  if (loading) return <Wrapper>로딩 중...</Wrapper>;
+  if (error) return <Wrapper>{error}</Wrapper>;
+  if (!post) return <Wrapper>게시글이 존재하지 않습니다.</Wrapper>;
+
   return (
     <Wrapper>
       <Header>
@@ -27,51 +142,51 @@ const MainDetail = () => {
       <ContentWrapper>
         <Post>
           <UserInfo>
-            <ProfileImage1
-              src={defImg}
-              alt="프로필"
-            />
+            <ProfileImage src={post.writerProfileImgUrl || defImg} alt="프로필" />
             <div className="info">
-              <div className="name">김주민</div>
-              <div className="date">08/12 20:00</div>
+              <div className="name">{post.writerName}</div>
+              <div className="date">
+                {new Date(post.createdAt).toLocaleString("ko-KR", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
             </div>
-            <MoreVertical size={18} color="black" />
           </UserInfo>
 
           <PostText>
-            <h2>가나다라마바사</h2>
-            <p>
-              아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하가
-            </p>
+            <h3>{post.title}</h3>
+            <p>{post.contents}</p>
           </PostText>
-        </Post>
 
-        <CommentList>
-          {comments.map((comment) => (
-            <CommentItem key={comment.id}>
-              <div className="left">
-                <ProfileImage2
-                  src={defImg}
-                  alt="프로필"
-                />
-              </div>
-              <div className="right">
-                <div className="header">
-                  <div className="name">{comment.author}</div>
-                  <div className="date">{comment.date}</div>
-                  <MoreVertical size={15} color="black" />
-                </div>
-                <div className="content">{comment.content}</div>
-                <ReplyButton>답글</ReplyButton>
-              </div>
-            </CommentItem>
-          ))}
-        </CommentList>
+          <CommentList>
+            <DetailComment
+              comments={comments}
+              userProfileImgUrl={post.writerProfileImgUrl}
+              onReplyClick={setReplyTarget}
+            />
+          </CommentList>
+        </Post>
       </ContentWrapper>
 
       <CommentInput>
-        <input type="text" placeholder="내용을 입력해주세요." />
-        <Send size={20} color="#17A1FA" />
+        <label>
+          <input
+            type="checkbox"
+            checked={isSecret}
+            onChange={(e) => setIsSecret(e.target.checked)}
+          />
+          비밀
+        </label>
+        <input
+          type="text"
+          placeholder={replyTarget ? "답글을 입력해주세요." : "댓글을 입력해주세요."}
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+        />
+        <Send size={20} color="#17A1FA" onClick={handleCommentSubmit} />
       </CommentInput>
     </Wrapper>
   );
@@ -79,154 +194,189 @@ const MainDetail = () => {
 
 export default MainDetail;
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-`;
 
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 50px;
-  background-color: white;
-  padding: 0 16px;
-  font-weight: 600;
-  border-bottom: 1px solid #D9D9D9;
 
-`;
+// import React, { useEffect, useState } from "react";
+// import { Send } from "lucide-react";
+// import { useParams, useLocation } from "react-router-dom";
+// import BackButton from "../../components/BackButton";
+// import axiosInstance from "../../apis/axiosInstance";
+// import DetailComment from "./DetailComment";
+// import {
+//   Wrapper,
+//   Header,
+//   ContentWrapper,
+//   Post,
+//   UserInfo,
+//   ProfileImage,
+//   PostText,
+//   CommentList,
+//   CommentInput,
+// } from "./mainDetail.styles";
+// import defImg from "../../assets/images/default_profileImage.png";
 
-const ContentWrapper = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 16px 80px;
-`;
+// interface PostData {
+//   id: number;
+//   postCategory: string;
+//   title: string;
+//   writerName: string;
+//   writerProfileImgUrl: string;
+//   contents: string;
+//   createdAt: string;
+// }
 
-const Post = styled.div`
-  background: white;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #D9D9D9;
-`;
+// interface CommentData {
+//   id: number;
+//   writerName: string;
+//   writerProfileImgUrl: string;
+//   rootId: number;
+//   contents: string;
+//   createdAt: string;
+//   isMine: boolean;
+//   isSecret: boolean;
+//   replies: CommentData[];
+// }
 
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+// interface PostDetailResponse {
+//   post: PostData;
+//   comments: CommentData[];
+// }
 
-  .info {
-    flex: 1;
-  }
+// const MainDetail: React.FC = () => {
+//   const params = useParams<{ postId: string }>();
+//   const location = useLocation();
+//   const paramPostId = params.postId;
 
-  .name {
-    font-weight: 600;
-    font-size: 14px;
-  }
+//   const [post, setPost] = useState<PostData | null>(null);
+//   const [comments, setComments] = useState<CommentData[]>([]);
+//   const [newComment, setNewComment] = useState("");
+//   const [replyTarget, setReplyTarget] = useState<number | null>(null);
+//   const [isSecret, setIsSecret] = useState(false);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
 
-  .date {
-    font-size: 12px;
-    color: #777;
-  }
-`;
+//   const resolvePostId = (): string | null => {
+//     if (paramPostId) return paramPostId;
+//     const m = location.pathname.match(/\/(\d+)(?:\/?$)/);
+//     if (m && m[1]) return m[1];
+//     const urlSearch = new URLSearchParams(location.search);
+//     return urlSearch.get("postId") ?? urlSearch.get("id");
+//   };
 
-const ProfileImage1 = styled.img`
-  width: 50px;
-  height: 50px;
-  background: #ddd;
-  object-fit: cover;
-`;
+//   const fetchPostDetail = async (idStr: string) => {
+//     setLoading(true);
+//     setError(null);
+//     try {
+//       const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${idStr}`);
+//       setPost(res.data.post);
+//       setComments(res.data.comments ?? []);
+//     } catch (err) {
+//       console.error(err);
+//       setError("게시글을 불러오지 못했습니다.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-const ProfileImage2 = styled.img`
-  width: 35px;
-  height: 35px;
-  background: #ddd;
-  object-fit: cover;
-`;
+//   useEffect(() => {
+//     const idResolved = resolvePostId();
+//     if (!idResolved) {
+//       setError("잘못된 게시물 주소입니다.");
+//       setLoading(false);
+//       return;
+//     }
+//     fetchPostDetail(idResolved);
+//   }, [location.pathname, location.search, paramPostId]);
 
-const PostText = styled.div`
-  h3 {
-    font-size: 15px;
-    font-weight: bold;
-    margin-bottom: 6px;
-  }
+//   const handleCommentSubmit = async () => {
+//     const idResolved = resolvePostId();
+//     if (!idResolved || !newComment.trim()) return;
 
-  p {
-    font-size: 13px;
-    color: #333;
-    line-height: 1.4;
-  }
-`;
+//     try {
+//       const res = await axiosInstance.post(`/api/v2/posts/${idResolved}/comments`, {
+//         contents: newComment,
+//         rootId: replyTarget ?? 0,
+//         isSecret,
+//       });
 
-const CommentList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-`;
+//       const newCommentData = res.data; // 서버에서 반환되는 새 댓글
+//       setComments(prev => {
+//         if (replyTarget) {
+//           return prev.map(c =>
+//             c.id === replyTarget
+//               ? { ...c, replies: [...c.replies, newCommentData] }
+//               : c
+//           );
+//         }
+//         return [...prev, newCommentData];
+//       });
 
-const CommentItem = styled.div`
-  display: flex;
-  align-items: flex-start;
+//       setNewComment("");
+//       setReplyTarget(null);
+//       setIsSecret(false);
+//     } catch (err) {
+//       console.error(err);
+//       alert("댓글 작성에 실패했습니다.");
+//     }
+//   };
 
-  .right {
-    flex: 1;
-    background: white;
-    border-radius: 10px;
-    padding-left: 10px;
-  }
+//   if (loading) return <Wrapper>로딩 중...</Wrapper>;
+//   if (error) return <Wrapper>{error}</Wrapper>;
+//   if (!post) return <Wrapper>게시글이 존재하지 않습니다.</Wrapper>;
 
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    margin-bottom: 4px;
-  }
+//   return (
+//     <Wrapper>
+//       <Header>
+//         <BackButton>자유게시판</BackButton>
+//       </Header>
 
-  .name {
-    font-weight: 600;
-  }
+//       <ContentWrapper>
+//         <Post>
+//           <UserInfo>
+//             <ProfileImage src={post.writerProfileImgUrl || defImg} alt="프로필" />
+//             <div className="info">
+//               <div className="name">{post.writerName}</div>
+//               <div className="date">
+//                 {new Date(post.createdAt).toLocaleString("ko-KR", {
+//                   month: "2-digit",
+//                   day: "2-digit",
+//                   hour: "2-digit",
+//                   minute: "2-digit",
+//                 })}
+//               </div>
+//             </div>
+//           </UserInfo>
 
-  .date {
-    color: rgba(0, 0, 0, 0.4);
-  }
+//           <PostText>
+//             <h3>{post.title}</h3>
+//             <p>{post.contents}</p>
+//           </PostText>
 
-  .content {
-    font-size: 13px;
-    margin-bottom: 10px;
-  }
-`;
+//           <CommentList>
+//             <DetailComment
+//               comments={comments}
+//               userProfileImgUrl={post.writerProfileImgUrl}
+//               onReplyClick={(commentId) => setReplyTarget(commentId)}
+//             />
+//           </CommentList>
+//         </Post>
+//       </ContentWrapper>
 
-const ReplyButton = styled.div`
-  width: 30px;
-  height: 20px;
-  text-align: center;
-  font-size: 12px;
-  color: black;
-  background: #E7E7E7;
-  cursor: pointer;
-`;
+//       <CommentInput>
+//         <label>
+//           <input type="checkbox" checked={isSecret} onChange={(e) => setIsSecret(e.target.checked)} />
+//           비밀
+//         </label>
+//         <input
+//           type="text"
+//           placeholder={replyTarget ? "답글을 입력해주세요." : "댓글을 입력해주세요."}
+//           value={newComment}
+//           onChange={(e) => setNewComment(e.target.value)}
+//         />
+//         <Send size={20} color="#17A1FA" onClick={handleCommentSubmit} />
+//       </CommentInput>
+//     </Wrapper>
+//   );
+// };
 
-const CommentInput = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 90%;
-  background: rgba(23, 161, 250, 0.15);
-  border-top: 1px solid #eee;
-  padding: 8px 12px;
-  margin: 21px 9px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-  }
-`;
+// export default MainDetail;
