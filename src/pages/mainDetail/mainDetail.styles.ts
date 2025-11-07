@@ -86,11 +86,11 @@ export const CommentList = styled.div`
   padding-top: 12px;
 `;
 
-export const CommentItem = styled.div<{ depth?: number }>`
+export const CommentItem = styled.div<{ $depth?: number }>`
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-left: ${({ depth }) => (depth ? depth * 32 : 0)}px;
+  margin-left: ${({ $depth }) => (($depth ?? 0) > 0 ? 32 : 0)}px;
 
   .comment-body {
     flex: 1;
@@ -170,4 +170,11 @@ export const CommentInput = styled.div`
   svg {
     cursor: pointer;
   }
+`;
+
+export const ReplyContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;

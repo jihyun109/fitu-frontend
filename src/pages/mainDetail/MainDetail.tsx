@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Send } from "lucide-react";
 import { useParams, useLocation } from "react-router-dom";
 import BackButton from "../../components/BackButton";
@@ -57,15 +57,15 @@ const MainDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const resolvePostId = (): string | null => {
+  const resolvePostId = useCallback((): string | null => {
     if (paramPostId) return paramPostId;
     const m = location.pathname.match(/\/(\d+)(?:\/?$)/);
     if (m && m[1]) return m[1];
     const urlSearch = new URLSearchParams(location.search);
     return urlSearch.get("postId") ?? urlSearch.get("id");
-  };
+  }, [paramPostId, location.pathname, location.search]);
 
-  const fetchPostDetail = async (idStr: string) => {
+  const fetchPostDetail = useCallback(async (idStr: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -78,7 +78,7 @@ const MainDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const idResolved = resolvePostId();
@@ -88,7 +88,7 @@ const MainDetail: React.FC = () => {
       return;
     }
     fetchPostDetail(idResolved);
-  }, [location.pathname, location.search, paramPostId]);
+  }, [resolvePostId, fetchPostDetail]);
 
   const handleCommentSubmit = async () => {
     const idResolved = resolvePostId();
@@ -106,17 +106,29 @@ const MainDetail: React.FC = () => {
 
       const newCommentData = res.data;
 
-      // 새 댓글 상태에 반영
-      setComments(prev => {
+      const addReplyRecursively = (
+        comments: CommentData[],
+        targetId: number,
+        newReply: CommentData
+      ): CommentData[] => {
+        return comments.map((c) => {
+          if (c.id === targetId) {
+            return { ...c, replies: [...(c.replies || []), newReply] };
+          }
+          if (c.replies && c.replies.length > 0) {
+            return {
+              ...c,
+              replies: addReplyRecursively(c.replies, targetId, newReply),
+            };
+          }
+          return c;
+        });
+      };
+
+      setComments((prev) => {
         if (replyTarget) {
-          // 답글인 경우
-          return prev.map(c =>
-            c.id === replyTarget
-              ? { ...c, replies: [...c.replies, newCommentData] }
-              : c
-          );
+          return addReplyRecursively(prev, replyTarget, newCommentData);
         }
-        // 새 댓글인 경우
         return [...prev, newCommentData];
       });
 
