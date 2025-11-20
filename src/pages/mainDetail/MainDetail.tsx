@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Send } from "lucide-react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import axiosInstance from "../../apis/axiosInstance";
 import DetailComment from "./DetailComment";
@@ -44,10 +44,27 @@ interface PostDetailResponse {
   comments: CommentData[];
 }
 
+const addReplyRecursively = (
+  comments: CommentData[],
+  targetId: number,
+  newReply: CommentData
+): CommentData[] => {
+  return comments.map((c) => {
+    if (c.id === targetId) {
+      return { ...c, replies: [...(c.replies || []), newReply] };
+    }
+    if (c.replies && c.replies.length > 0) {
+      return {
+        ...c,
+        replies: addReplyRecursively(c.replies, targetId, newReply),
+      };
+    }
+    return c;
+  });
+};
+
 const MainDetail: React.FC = () => {
-  const params = useParams<{ postId: string }>();
-  const location = useLocation();
-  const paramPostId = params.postId;
+  const { id: postId } = useParams<{ id: string }>();
 
   const [post, setPost] = useState<PostData | null>(null);
   const [comments, setComments] = useState<CommentData[]>([]);
@@ -57,46 +74,37 @@ const MainDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const resolvePostId = useCallback((): string | null => {
-    if (paramPostId) return paramPostId;
-    const m = location.pathname.match(/\/(\d+)(?:\/?$)/);
-    if (m && m[1]) return m[1];
-    const urlSearch = new URLSearchParams(location.search);
-    return urlSearch.get("postId") ?? urlSearch.get("id");
-  }, [paramPostId, location.pathname, location.search]);
-
-  const fetchPostDetail = useCallback(async (idStr: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${idStr}`);
-      setPost(res.data.post);
-      setComments(res.data.comments ?? []);
-    } catch (err) {
-      console.error(err);
-      setError("게시글을 불러오지 못했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    const idResolved = resolvePostId();
-    if (!idResolved) {
-      setError("잘못된 게시물 주소입니다.");
+    if (!postId) {
+      setError("잘못된 접근입니다.");
       setLoading(false);
       return;
     }
-    fetchPostDetail(idResolved);
-  }, [resolvePostId, fetchPostDetail]);
+
+    const fetchPostDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${postId}`);
+        setPost(res.data.post);
+        setComments(res.data.comments ?? []);
+      } catch (err) {
+        console.error(err);
+        setError("게시글을 불러오지 못했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPostDetail();
+  }, [postId]);
 
   const handleCommentSubmit = async () => {
-    const idResolved = resolvePostId();
-    if (!idResolved || !newComment.trim()) return;
+    if (!postId || !newComment.trim()) return;
 
     try {
       const res = await axiosInstance.post<CommentData>(
-        `/api/v2/posts/${idResolved}/comments`,
+        `/api/v2/posts/${postId}/comments`,
         {
           contents: newComment,
           rootId: replyTarget ?? 0,
@@ -105,25 +113,6 @@ const MainDetail: React.FC = () => {
       );
 
       const newCommentData = res.data;
-
-      const addReplyRecursively = (
-        comments: CommentData[],
-        targetId: number,
-        newReply: CommentData
-      ): CommentData[] => {
-        return comments.map((c) => {
-          if (c.id === targetId) {
-            return { ...c, replies: [...(c.replies || []), newReply] };
-          }
-          if (c.replies && c.replies.length > 0) {
-            return {
-              ...c,
-              replies: addReplyRecursively(c.replies, targetId, newReply),
-            };
-          }
-          return c;
-        });
-      };
 
       setComments((prev) => {
         if (replyTarget) {

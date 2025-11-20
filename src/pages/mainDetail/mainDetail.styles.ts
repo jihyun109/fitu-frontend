@@ -86,11 +86,11 @@ export const CommentList = styled.div`
   padding-top: 12px;
 `;
 
-export const CommentItem = styled.div<{ $depth?: number }>`
+export const CommentItemWrapper = styled.div<{ $depth?: number }>`
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-left: ${({ $depth }) => (($depth ?? 0) > 0 ? 32 : 0)}px;
+  margin-left: ${({ $depth }) => ($depth ? 32 : 0)}px;
 
   .comment-body {
     flex: 1;
@@ -139,17 +139,26 @@ export const EmptyComment = styled.div`
 `;
 
 export const CommentInput = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 90%;
-  background: rgba(23, 161, 250, 0.15);
-  border-top: 1px solid #eee;
-  padding: 8px 12px;
-  margin: 21px 9px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+
+width: calc(100% - 32px);
+
+background: #EFF8FF;
+background: rgba(23, 161, 250, 0.15); 
+backdrop-filter: blur(5px);
+
+border-radius: 20px;
+border: 1px solid #eee;
+
+padding: 8px 16px;
+display: flex;
+align-items: center;
+gap: 8px;
+box-sizing: border-box;
+z-index: 100;
 
   label {
     display: flex;
