@@ -94,18 +94,27 @@ export const CommentItemWrapper = styled.div<{ $depth?: number }>`
 
   .comment-body {
     flex: 1;
+    width: 100%;
   }
 
   .comment-header {
     display: flex;
-    flex-direction: column;
-    font-size: 12px;
-    color: #555;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 4px;
+    width: 100%;
+  }
+  
+  .info-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
   }
 
   .name {
     font-weight: 600;
+    font-size: 14px;
     color: #333;
   }
 
@@ -118,6 +127,7 @@ export const CommentItemWrapper = styled.div<{ $depth?: number }>`
   p {
     font-size: 13px;
     margin: 0;
+    line-height: 1.4;
   }
 `;
 

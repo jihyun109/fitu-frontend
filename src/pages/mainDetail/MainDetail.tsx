@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Send } from "lucide-react";
 import { useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import axiosInstance from "../../apis/axiosInstance";
 import DetailComment from "./DetailComment";
+import MoreMenu from "./components/MoreMenu";
 import {
   Wrapper,
   Header,
@@ -14,7 +15,7 @@ import {
   PostText,
   CommentList,
   CommentInput,
-} from "./mainDetail.styles";
+} from "./styles/mainDetail.styles";
 import defImg from "../../assets/images/default_profileImage.png";
 
 interface PostData {
@@ -74,30 +75,51 @@ const MainDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchPostDetail = useCallback(async () => {
+    if (!postId) return;
+    
+    try {
+      const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${postId}`);
+      setPost(res.data.post);
+      setComments(res.data.comments ?? []);
+    } catch (err) {
+      console.error(err);
+      setError("게시글을 불러오지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }, [postId]);
+
   useEffect(() => {
     if (!postId) {
       setError("잘못된 접근입니다.");
       setLoading(false);
       return;
     }
-
-    const fetchPostDetail = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${postId}`);
-        setPost(res.data.post);
-        setComments(res.data.comments ?? []);
-      } catch (err) {
-        console.error(err);
-        setError("게시글을 불러오지 못했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPostDetail();
-  }, [postId]);
+  }, [fetchPostDetail, postId]);
+
+  const handlePostReport = async () => {
+    if (!postId) return;
+    if (!window.confirm("이 게시글을 신고하시겠습니까?")) return;
+
+    try {
+      await axiosInstance.post("/api/v2/reports", {
+        targetId: Number(postId),
+        targetType: "POST",
+      });
+      alert("게시글이 신고되었습니다.");
+    } catch (error) {
+      console.error(error);
+      alert("신고 처리에 실패했습니다.");
+    }
+  };
+
+  const handlePostDelete = () => {
+    if (window.confirm("게시글을 삭제하시겠습니까? (기능 미구현)")) {
+      alert("삭제 버튼 클릭됨 (API 연동 필요)");
+    }
+  };
 
   const handleCommentSubmit = async () => {
     if (!postId || !newComment.trim()) return;
@@ -155,6 +177,8 @@ const MainDetail: React.FC = () => {
                 })}
               </div>
             </div>
+
+            <MoreMenu onReport={handlePostReport} onDelete={handlePostDelete} />
           </UserInfo>
 
           <PostText>
@@ -167,6 +191,8 @@ const MainDetail: React.FC = () => {
               comments={comments}
               userProfileImgUrl={post.writerProfileImgUrl}
               onReplyClick={setReplyTarget}
+              postId={Number(postId)}
+              onRefresh={fetchPostDetail}
             />
           </CommentList>
         </Post>
