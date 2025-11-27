@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Send } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import axiosInstance from "../../apis/axiosInstance";
 import DetailComment from "./DetailComment";
@@ -66,7 +66,7 @@ const addReplyRecursively = (
 
 const MainDetail: React.FC = () => {
   const { id: postId } = useParams<{ id: string }>();
-
+  const navigate = useNavigate();
   const [post, setPost] = useState<PostData | null>(null);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -115,9 +115,15 @@ const MainDetail: React.FC = () => {
     }
   };
 
-  const handlePostDelete = () => {
-    if (window.confirm("게시글을 삭제하시겠습니까? (기능 미구현)")) {
-      alert("삭제 버튼 클릭됨 (API 연동 필요)");
+  const handlePostDelete = async () => {
+    if (!postId) return;
+    if (!window.confirm("정말 이 게시물을 삭제하시겠습니까?")) return;
+    try {
+      await axiosInstance.delete(`/api/v2/posts/${postId}`);
+      alert("게시물이 삭제됐습니다.");
+      navigate(-1);
+    } catch(error) {
+      alert("게시물 삭제를 실패했습니다.");
     }
   };
 
