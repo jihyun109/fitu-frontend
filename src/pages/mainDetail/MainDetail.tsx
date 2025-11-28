@@ -45,6 +45,12 @@ interface PostDetailResponse {
   comments: CommentData[];
 }
 
+const categoryLabels: { [key: string]: string } = {
+  FREE_BOARD: "자유게시판",
+  WORKOUT_INFO: "정보게시판",
+  WORKOUT_MATE: "메이트게시판",
+}
+
 const addReplyRecursively = (
   comments: CommentData[],
   targetId: number,
@@ -117,13 +123,13 @@ const MainDetail: React.FC = () => {
 
   const handlePostDelete = async () => {
     if (!postId) return;
-    if (!window.confirm("정말 이 게시물을 삭제하시겠습니까?")) return;
+    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
     try {
       await axiosInstance.delete(`/api/v2/posts/${postId}`);
-      alert("게시물이 삭제됐습니다.");
+      alert("게시글이 삭제됐습니다.");
       navigate(-1);
     } catch(error) {
-      alert("게시물 삭제를 실패했습니다.");
+      alert("게시글 삭제를 실패했습니다.");
     }
   };
 
@@ -165,7 +171,9 @@ const MainDetail: React.FC = () => {
   return (
     <Wrapper>
       <Header>
-        <BackButton>자유게시판</BackButton>
+        <BackButton>
+          {categoryLabels[post.postCategory]}
+        </BackButton>
       </Header>
 
       <ContentWrapper>

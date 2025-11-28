@@ -1,25 +1,69 @@
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import axiosInstance from "../../apis/axiosInstance";
 
 interface MainWritingProps {
   onClose: () => void;
+  category: "FREE_BOARD" | "WORKOUT_INFO" | "WORKOUT_MATE";
 }
+const categoryLabels: { [key: string]: string } = {
+  FREE_BOARD: "자유게시판",
+  WORKOUT_INFO: "정보게시판",
+  WORKOUT_MATE: "메이트게시판",
+};
 
-const MainWriting = ({ onClose }: MainWritingProps) => {
+const MainWriting = ({ onClose, category }: MainWritingProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCloseTrigger = () => {
+    setIsClosing(true);
+  };
+
+  const handleAnimationEnd = () => {
+    if (isClosing) {
+      onClose();
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (title.trim() === "") {
+      alert("제목을 입력해주세요.");
+      return;
+    }
+    if (content.trim() === "") {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      await axiosInstance.post("/api/v2/posts", {
+        category: category,
+        title: title,
+        contents: content,
+      });
+      alert("게시글이 등록되었습니다.");
+      handleCloseTrigger();
+    } catch(error){
+      alert("게시글 등록을 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <Overlay>
-      <Container>
+    <Wrapper>
+      <Container 
+        $isClosing={isClosing} 
+        onAnimationEnd={handleAnimationEnd}
+      >
         <HeaderRow>
           <LeftGroup>
             <Chip>제목</Chip>
@@ -29,14 +73,16 @@ const MainWriting = ({ onClose }: MainWritingProps) => {
               onChange={(e) => setTitle(e.target.value)}
             />
           </LeftGroup>
-          <CloseButton onClick={onClose}>
+          <CloseButton onClick={handleCloseTrigger}>
             <X size={20} color="#17a1fa" />
           </CloseButton>
         </HeaderRow>
 
         <Row>
-          <Chip>자유게시판</Chip>
-          <RegisterButton>등록하기</RegisterButton>
+          <Chip>{categoryLabels[category]}</Chip>
+          <RegisterButton onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "등록 중..." : "등록하기"}
+            </RegisterButton>
         </Row>
 
         <ContentBox>
@@ -47,37 +93,61 @@ const MainWriting = ({ onClose }: MainWritingProps) => {
           />
         </ContentBox>
       </Container>
-    </Overlay>
+    </Wrapper>
   );
 };
 
 export default MainWriting;
 
-const Overlay = styled.div`
-  position: fixed; 
+const slideUp = keyframes`
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+`;
+
+const slideDown = keyframes`
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+`;
+
+const Wrapper = styled.div`
+  position: absolute; 
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
+  
+  z-index: 50; 
+  
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 20px;
 `;
 
-const Container = styled.div`
-  width: 100%;
-  max-width: 500px;
-  height: 70vh;
+const Container = styled.div<{ $isClosing: boolean }>`
+  width: 85%;
+  height: 80%;
   background: white;
-  border-radius: 12px;
+  border-radius: 12px 12px 0 0;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: ${({ $isClosing }) => 
+    $isClosing 
+      ? css`${slideDown} 0.3s ease-in-out forwards` 
+      : css`${slideUp} 0.3s ease-out forwards`
+  };
+  
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
 `;
 
 const Row = styled.div`
