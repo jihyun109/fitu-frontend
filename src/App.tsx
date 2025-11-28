@@ -15,7 +15,7 @@ import CalendarDetail from "./pages/myPage/components/CalendarDetail";
 import MainDetail from "./pages/mainDetail/MainDetail";
 import Medal from "./pages/medalPage/Medal";
 import ExercisePage from "./pages/exercisePage/ExercisePage";
-import ChatPage from "./pages/chatPage/ChatPage";
+import ChatPage from "./pages/chatPage/chatPage";
 function App() {
   return (
     <div className="App">
