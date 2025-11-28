@@ -6,6 +6,7 @@ const ExerciseBTN = ()=>{
 return(
     <Container>
         <CustomBTN>커스텀하기</CustomBTN>
+        <CustomBTN style={{backgroundColor:'white', color:'#007AFF', border:'1px solid #007AFF'}}>루틴 추천받기</CustomBTN>
     </Container>
 )
 
@@ -18,6 +19,7 @@ const Container = styled.div`
     flex-direction: column;
     width: 100%;
     align-items: center;
+    gap: 10px;
 `;
 
 const CustomBTN = styled.button`
@@ -29,4 +31,7 @@ const CustomBTN = styled.button`
     background-color:#007AFF;
     color: white;
     height: 56px;
+    border-radius: 12px;
+    border: none;
+    font-size: 18px;
 `;

@@ -9,10 +9,13 @@ const ExercisePage = () => {
   return (
     <Container>
       <BackButton />
-      <p style={{marginTop:'50px'}}>운동할 부위를</p>
+     
+      <p style={{ marginTop: "50px" }}>운동할 부위를</p>
       <p>골라주세요!</p>
-      <SelectBox selected={exerciseArea} onChange={setExerciseArea} />
-      <ExerciseBTN/>
+       <Layout>
+        <SelectBox selected={exerciseArea} onChange={setExerciseArea} />
+        </Layout>
+        <ExerciseBTN />
     </Container>
   );
 };
@@ -24,12 +27,22 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 20px;
-  box-sizing: border-box; 
-
+  padding: 30px;
+  box-sizing: border-box;
+  height: 100vh;
   p {
     margin: 0;
-    font-size: 28px; 
+    font-size: 28px;
     font-weight: 700;
   }
+`;
+
+const Layout = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  flex-direction: column;
+   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 `;
