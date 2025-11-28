@@ -44,7 +44,7 @@ const MedalRanking: React.FC<Props> = ({
       </Header>
 
       {updateTime && <UpdateText>업데이트 : {updateTime}</UpdateText>}
-
+{rankingData.length ? 
       <Body>
         {top3.length === 3 && (
           <Top3Area>
@@ -112,7 +112,9 @@ const MedalRanking: React.FC<Props> = ({
             ) : null;
           })()}
         </MyRank>
-      </Body>
+      </Body> :
+      <Body>데이터 없음</Body>
+      }
       {!showInfoText ? <ProofShot /> : <Footer />}
     </Wrapper>
   );
