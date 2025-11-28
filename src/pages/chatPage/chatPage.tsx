@@ -36,6 +36,7 @@ const dummyChatRooms: ChatRoom[] = [
   { id: 3, name: '김주민', lastMessage: '오늘 운동 몇시에 가?', profileImage: defaultImage },
   { id: 4, name: '김주민', lastMessage: '친구와 채팅을 시작해보세요', profileImage: defaultImage },
 ];
+
 const ChatPage: React.FC = () => {
   return (
     <PageContainer>

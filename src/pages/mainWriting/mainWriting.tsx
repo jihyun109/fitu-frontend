@@ -51,6 +51,7 @@ const MainWriting = ({ onClose, category }: MainWritingProps) => {
       });
       alert("게시글이 등록되었습니다.");
       handleCloseTrigger();
+      window.location.reload();
     } catch(error){
       alert("게시글 등록을 실패했습니다.");
     } finally {
