@@ -61,8 +61,6 @@ const Container = styled.div`
   align-items: center;
   gap: 16px;
   margin-top: 24px;
-  margin-left: auto;
-  margin-right: auto;
   width: 100%;
 `;
 
@@ -71,8 +69,9 @@ const Label = styled.label<LabelProps>`
   align-items: center;
   gap: 16px; 
   background-color: ${props => props.checked ? '#F6FCFF' : '#F2F4F5'}; 
-  padding: 10px 24px;
-  width: 80%;
+  padding: 10px 30px;
+  box-sizing: border-box;
+  width: 100%;
   border-radius: 16px; 
   cursor: pointer;
   transition: all 0.2s ease;
@@ -85,8 +84,6 @@ const Label = styled.label<LabelProps>`
 `;
 
 const Checkbox = styled.input`
-  width: 32px;
-  height: 32px; 
   accent-color: #e45258;
   cursor: pointer;
   margin: 0;
