@@ -1,11 +1,11 @@
 import React from "react"
 import styled from "styled-components"
-
+import { useNavigate } from "react-router-dom"
 const ExerciseBTN = ()=>{
-
+const navigate = useNavigate();
 return(
     <Container>
-        <CustomBTN>커스텀하기</CustomBTN>
+        <CustomBTN onClick={()=>{navigate('/exercise/custom')}}>커스텀하기</CustomBTN>
         <CustomBTN style={{backgroundColor:'white', color:'#007AFF', border:'1px solid #007AFF'}}>루틴 추천받기</CustomBTN>
     </Container>
 )
