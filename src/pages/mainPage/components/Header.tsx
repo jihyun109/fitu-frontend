@@ -9,7 +9,9 @@ const Header: React.FC<HeaderProps> = ({ name }) => {
   const navigate = useNavigate();
   return (
     <HeaderWrapper>
-      <HeaderItem style={{ justifyContent: "left" }}>{name}</HeaderItem>
+      <HeaderItem 
+        onClick={() => navigate('/home')}
+        style={{ justifyContent: "left" }}>{name}</HeaderItem>
       <HeaderItem
         onClick={()=>navigate('/')}
         style={{ fontWeight: "400", fontSize: "40px", color: "#17A1FA",width:'87px' }}

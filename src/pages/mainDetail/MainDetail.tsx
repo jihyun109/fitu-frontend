@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Send } from "lucide-react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import axiosInstance from "../../apis/axiosInstance";
 import DetailComment from "./DetailComment";
+import MoreMenu from "./components/MoreMenu";
 import {
   Wrapper,
   Header,
@@ -14,7 +15,7 @@ import {
   PostText,
   CommentList,
   CommentInput,
-} from "./mainDetail.styles";
+} from "./styles/mainDetail.styles";
 import defImg from "../../assets/images/default_profileImage.png";
 
 interface PostData {
@@ -44,11 +45,34 @@ interface PostDetailResponse {
   comments: CommentData[];
 }
 
-const MainDetail: React.FC = () => {
-  const params = useParams<{ postId: string }>();
-  const location = useLocation();
-  const paramPostId = params.postId;
+const categoryLabels: { [key: string]: string } = {
+  FREE_BOARD: "자유게시판",
+  WORKOUT_INFO: "정보게시판",
+  WORKOUT_MATE: "메이트게시판",
+}
 
+const addReplyRecursively = (
+  comments: CommentData[],
+  targetId: number,
+  newReply: CommentData
+): CommentData[] => {
+  return comments.map((c) => {
+    if (c.id === targetId) {
+      return { ...c, replies: [...(c.replies || []), newReply] };
+    }
+    if (c.replies && c.replies.length > 0) {
+      return {
+        ...c,
+        replies: addReplyRecursively(c.replies, targetId, newReply),
+      };
+    }
+    return c;
+  });
+};
+
+const MainDetail: React.FC = () => {
+  const { id: postId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [post, setPost] = useState<PostData | null>(null);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -57,19 +81,11 @@ const MainDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const resolvePostId = useCallback((): string | null => {
-    if (paramPostId) return paramPostId;
-    const m = location.pathname.match(/\/(\d+)(?:\/?$)/);
-    if (m && m[1]) return m[1];
-    const urlSearch = new URLSearchParams(location.search);
-    return urlSearch.get("postId") ?? urlSearch.get("id");
-  }, [paramPostId, location.pathname, location.search]);
-
-  const fetchPostDetail = useCallback(async (idStr: string) => {
-    setLoading(true);
-    setError(null);
+  const fetchPostDetail = useCallback(async () => {
+    if (!postId) return;
+    
     try {
-      const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${idStr}`);
+      const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${postId}`);
       setPost(res.data.post);
       setComments(res.data.comments ?? []);
     } catch (err) {
@@ -78,25 +94,51 @@ const MainDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [postId]);
 
   useEffect(() => {
-    const idResolved = resolvePostId();
-    if (!idResolved) {
-      setError("잘못된 게시물 주소입니다.");
+    if (!postId) {
+      setError("잘못된 접근입니다.");
       setLoading(false);
       return;
     }
-    fetchPostDetail(idResolved);
-  }, [resolvePostId, fetchPostDetail]);
+    fetchPostDetail();
+  }, [fetchPostDetail, postId]);
+
+  const handlePostReport = async () => {
+    if (!postId) return;
+    if (!window.confirm("이 게시글을 신고하시겠습니까?")) return;
+
+    try {
+      await axiosInstance.post("/api/v2/reports", {
+        targetId: Number(postId),
+        targetType: "POST",
+      });
+      alert("게시글이 신고되었습니다.");
+    } catch (error) {
+      console.error(error);
+      alert("신고 처리에 실패했습니다.");
+    }
+  };
+
+  const handlePostDelete = async () => {
+    if (!postId) return;
+    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+    try {
+      await axiosInstance.delete(`/api/v2/posts/${postId}`);
+      alert("게시글이 삭제됐습니다.");
+      navigate(-1);
+    } catch(error) {
+      alert("게시글 삭제를 실패했습니다.");
+    }
+  };
 
   const handleCommentSubmit = async () => {
-    const idResolved = resolvePostId();
-    if (!idResolved || !newComment.trim()) return;
+    if (!postId || !newComment.trim()) return;
 
     try {
       const res = await axiosInstance.post<CommentData>(
-        `/api/v2/posts/${idResolved}/comments`,
+        `/api/v2/posts/${postId}/comments`,
         {
           contents: newComment,
           rootId: replyTarget ?? 0,
@@ -105,25 +147,6 @@ const MainDetail: React.FC = () => {
       );
 
       const newCommentData = res.data;
-
-      const addReplyRecursively = (
-        comments: CommentData[],
-        targetId: number,
-        newReply: CommentData
-      ): CommentData[] => {
-        return comments.map((c) => {
-          if (c.id === targetId) {
-            return { ...c, replies: [...(c.replies || []), newReply] };
-          }
-          if (c.replies && c.replies.length > 0) {
-            return {
-              ...c,
-              replies: addReplyRecursively(c.replies, targetId, newReply),
-            };
-          }
-          return c;
-        });
-      };
 
       setComments((prev) => {
         if (replyTarget) {
@@ -148,7 +171,9 @@ const MainDetail: React.FC = () => {
   return (
     <Wrapper>
       <Header>
-        <BackButton>자유게시판</BackButton>
+        <BackButton>
+          {categoryLabels[post.postCategory]}
+        </BackButton>
       </Header>
 
       <ContentWrapper>
@@ -166,6 +191,8 @@ const MainDetail: React.FC = () => {
                 })}
               </div>
             </div>
+
+            <MoreMenu onReport={handlePostReport} onDelete={handlePostDelete} />
           </UserInfo>
 
           <PostText>
@@ -178,6 +205,8 @@ const MainDetail: React.FC = () => {
               comments={comments}
               userProfileImgUrl={post.writerProfileImgUrl}
               onReplyClick={setReplyTarget}
+              postId={Number(postId)}
+              onRefresh={fetchPostDetail}
             />
           </CommentList>
         </Post>

@@ -16,6 +16,8 @@ import MainDetail from "./pages/mainDetail/MainDetail";
 import Medal from "./pages/medalPage/Medal";
 import ExercisePage from "./pages/exercisePage/ExercisePage";
 import CustomPage from "./pages/exercisePage/customPage/customPage";
+import ChatPage from "./pages/chatPage/chatPage";
+
 function App() {
   return (
     <div className="App">
@@ -38,6 +40,7 @@ function App() {
         <Route path="/home/medal" element={<Medal/>} />
         <Route path="/exercise" element={<ExercisePage/>} />
         <Route path="/exercise/custom" element={<CustomPage/>} />
+        <Route path="/chatlist" element={<ChatPage/>} />
       </Routes>
     </div>
   );

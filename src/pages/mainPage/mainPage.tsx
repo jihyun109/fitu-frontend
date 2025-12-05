@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ArrowDown from "../../assets/images/ArrowDown.png";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../apis/axiosInstance";
+import MainWriting from "../mainWriting/mainWriting";
 
 interface Post {
   id: number;
@@ -33,6 +34,7 @@ const MainPage = () => {
     { value: "WORKOUT_INFO", label: "정보게시판" },
     { value: "WORKOUT_MATE", label: "메이트게시판" },
   ];
+  const [isWritingOpen, setIsWritingOpen] = useState(false);
 
   const fetchPosts = async (pageNum: number, selectedCategory = category) => {
     if (isLoading || (!hasNext && pageNum !== 0)) return;
@@ -177,10 +179,16 @@ const MainPage = () => {
             )}
           </BoardList>
 
-          <WriteButton>
+          <WriteButton onClick={() => setIsWritingOpen(true)}>
             <Pencil size={18} />
           </WriteButton>
         </Board>
+        {isWritingOpen && (
+          <MainWriting 
+            onClose={() => setIsWritingOpen(false)} 
+            category={category}
+          />
+        )}
       </MainContent>
       <Footer />
     </Wrapper>
