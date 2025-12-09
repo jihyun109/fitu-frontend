@@ -1,17 +1,43 @@
 import styled from "styled-components"
 
-const Categories = ({ selected, onSelect }: { selected?: string; onSelect?: (s: string) => void }) => {
-    const cats = ["어깨","가슴","등","팔","하체"]
-    return (
-        <Container>
-          <PillRow>
-            {cats.map((t) => (
-              <Pill key={t} active={t === selected} onClick={() => onSelect?.(t)}>{t}</Pill>
-            ))}
-          </PillRow>
-        </Container>   
-    )
-}
+type Category = {
+  label: string;  
+  value: string;  
+};
+
+const Categories = ({
+  selected,
+  onSelect,
+}: {
+  selected?: string;
+  onSelect?: (s: string) => void;
+}) => {
+
+  const cats: Category[] = [
+    { label: "어깨", value: "shoulder" },
+    { label: "가슴", value: "chest" },
+    { label: "등", value: "back" },
+    { label: "팔", value: "arm" },
+    { label: "하체", value: "lower_part" },
+  ];
+
+  return (
+    <Container>
+      <PillRow>
+        {cats.map((c) => (
+          <Pill
+            key={c.value}
+            active={c.value === selected}
+            onClick={() => onSelect?.(c.value)}
+          >
+            {c.label}
+          </Pill>
+        ))}
+      </PillRow>
+    </Container>
+  );
+};
+
 
 export default Categories
 
