@@ -27,7 +27,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
 
       try {
         const res = await fetch(`${API_BASE}/api/v2/profile-image/history`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `${token}` },
         });
 
         if (!res.ok) throw new Error("히스토리 불러오기 실패");
@@ -73,7 +73,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
 
       const res = await fetch(`${API_BASE}/api/v2/profile-image`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `${token}` },
         body: formData,
       });
 
@@ -93,7 +93,6 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
     }
   };
 
-  // 이미지 히스토리 - 이미지 삭제
   const handleDelete = async (imgUrl: string) => {
     const token = sessionStorage.getItem("Authorization");
     if (!token) return;
@@ -102,7 +101,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       const res = await fetch(`${API_BASE}/api/v2/profile-image`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ imageUrl: imgUrl }),
@@ -113,7 +112,6 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       const updated = historyImages.filter((url) => url !== imgUrl);
       setHistoryImages(updated);
 
-      // 이미지 삭제하고 어떤 이미지로 변경할지 선택해야함
       if (updated.length === 0) {
         onImageChange(DefaultProfile);
       } else if (imgUrl === updated[0]) {

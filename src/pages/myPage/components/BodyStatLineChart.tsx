@@ -59,7 +59,7 @@ export default function BodyStatLineChart() {
 
         const res = await fetch(url, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         });
