@@ -1,6 +1,7 @@
 import React from "react";
 import axiosInstance from "../../apis/axiosInstance";
 import MoreMenu from "./components/MoreMenu";
+import { Lock } from "lucide-react";
 import {
   ProfileImageSmall,
   CommentItemWrapper,
@@ -12,6 +13,7 @@ import defImg from "../../assets/images/default_profileImage.png";
 
 interface CommentData {
   id: number;
+  writerId: number;
   writerName: string;
   writerProfileImgUrl: string | null;
   rootId: number;
@@ -28,6 +30,7 @@ interface DetailCommentProps {
   userProfileImgUrl?: string;
   postId: number;
   onRefresh: () => void;
+  isPostOwner: boolean;
 }
 
 const SingleCommentItem: React.FC<{
@@ -37,8 +40,11 @@ const SingleCommentItem: React.FC<{
   userProfileImgUrl?: string;
   postId: number;
   onRefresh: () => void;
-}> = ({ comment, depth, onReplyClick, userProfileImgUrl, postId, onRefresh }) => {
+  isPostOwner: boolean;
+}> = ({ comment, depth, onReplyClick, userProfileImgUrl, postId, onRefresh, isPostOwner }) => {
   const safeDepth = Math.min(depth, 1);
+
+  const canShowContent = !comment.isSecret || comment.isMine || isPostOwner;
 
   const handleReport = async () => {
     if (!window.confirm("이 댓글을 신고하시겠습니까?")) return;
@@ -71,7 +77,10 @@ const SingleCommentItem: React.FC<{
     <div>
       <CommentItemWrapper $depth={safeDepth}>
         <ProfileImageSmall
-          src={comment.writerProfileImgUrl || (comment.isMine ? userProfileImgUrl || defImg : defImg)}
+          src={
+            comment.writerProfileImgUrl ||
+            (comment.isMine ? userProfileImgUrl || defImg : defImg)
+          }
           alt="댓글자"
         />
         <div className="comment-body">
@@ -80,21 +89,45 @@ const SingleCommentItem: React.FC<{
               <span className="name">{comment.writerName}</span>
               <span className="date">
                 {new Date(comment.createdAt).toLocaleString("ko-KR", {
-                  month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </span>
+              {comment.isSecret && (
+                <Lock
+                  size={12}
+                  strokeWidth={2}
+                  color="#777"
+                  style={{ marginTop: "2px" }}
+                />
+              )}
             </div>
-            
-            <MoreMenu 
-              onReport={handleReport} 
-              onDelete={handleDelete} 
-            />
+
+            <MoreMenu onReport={handleReport} onDelete={handleDelete} />
           </div>
-          
-          <p>{comment.contents}</p>
-          <ReplyButton onClick={() => onReplyClick(comment.id)}>
-            ↳ 답글
-          </ReplyButton>
+
+          {canShowContent ? (
+            <p>{comment.contents}</p>
+          ) : (
+            <p
+              style={{
+                color: "#888",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <Lock size={14} /> 비밀 댓글입니다.
+            </p>
+          )}
+
+          {canShowContent && (
+            <ReplyButton onClick={() => onReplyClick(comment.id)}>
+              ↳ 답글
+            </ReplyButton>
+          )}
         </div>
       </CommentItemWrapper>
 
@@ -109,6 +142,7 @@ const SingleCommentItem: React.FC<{
               userProfileImgUrl={userProfileImgUrl}
               postId={postId}
               onRefresh={onRefresh}
+              isPostOwner={isPostOwner}
             />
           ))}
         </ReplyContainer>
@@ -123,6 +157,7 @@ const DetailComment: React.FC<DetailCommentProps> = ({
   userProfileImgUrl,
   postId,
   onRefresh,
+  isPostOwner,
 }) => {
   if (!comments || comments.length === 0)
     return <EmptyComment>아직 댓글이 없습니다.</EmptyComment>;
@@ -138,6 +173,7 @@ const DetailComment: React.FC<DetailCommentProps> = ({
           userProfileImgUrl={userProfileImgUrl}
           postId={postId}
           onRefresh={onRefresh}
+          isPostOwner={isPostOwner}
         />
       ))}
     </>

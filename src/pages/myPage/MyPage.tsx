@@ -59,7 +59,7 @@ export default function MyPage() {
 
       try {
         const res = await fetch("https://hanseifitu.shop/api/v2/physical-infos", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `${token}` },
         });
         if (!res.ok) throw new Error("최신 신체 정보 get 실패");
         const data = await res.json();
@@ -97,7 +97,7 @@ export default function MyPage() {
       const res = await fetch("https://hanseifitu.shop/api/v2/physical-infos", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -118,7 +118,7 @@ export default function MyPage() {
 
       try {
         const res = await fetch("https://hanseifitu.shop/api/v2/profile-image", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `${token}` },
         });
         if (!res.ok) throw new Error("이미지 불러오기 실패");
         const data = await res.json();
