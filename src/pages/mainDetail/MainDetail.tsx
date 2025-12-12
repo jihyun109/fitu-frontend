@@ -22,6 +22,7 @@ interface PostData {
   id: number;
   postCategory: string;
   title: string;
+  writerId: number;
   writerName: string;
   writerProfileImgUrl: string;
   contents: string;
@@ -30,6 +31,7 @@ interface PostData {
 
 interface CommentData {
   id: number;
+  writerId: number;
   writerName: string;
   writerProfileImgUrl: string;
   rootId: number;
@@ -80,13 +82,29 @@ const MainDetail: React.FC = () => {
   const [isSecret, setIsSecret] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (replyTarget) {
+      setIsSecret(false);
+    }
+  }, [replyTarget])
+
+  useEffect(() => {
+    const storedId = localStorage.getItem("userId"); 
+    if (storedId) {
+      setCurrentUserId(Number(storedId));
+    }
+  }, []);
 
   const fetchPostDetail = useCallback(async () => {
     if (!postId) return;
-    
+
     try {
       const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${postId}`);
+
       setPost(res.data.post);
+
       setComments(res.data.comments ?? []);
     } catch (err) {
       console.error(err);
@@ -95,6 +113,8 @@ const MainDetail: React.FC = () => {
       setLoading(false);
     }
   }, [postId]);
+
+  const isPostOwner = post ? post.writerId === currentUserId : false;
 
   useEffect(() => {
     if (!postId) {
@@ -142,11 +162,11 @@ const MainDetail: React.FC = () => {
         {
           contents: newComment,
           rootId: replyTarget ?? 0,
-          isSecret,
+          isSecret: replyTarget ? false : isSecret, 
         }
       );
 
-      const newCommentData = res.data;
+      const newCommentData = { ...res.data, isMine: true };
 
       setComments((prev) => {
         if (replyTarget) {
@@ -171,15 +191,16 @@ const MainDetail: React.FC = () => {
   return (
     <Wrapper>
       <Header>
-        <BackButton>
-          {categoryLabels[post.postCategory]}
-        </BackButton>
+        <BackButton>{categoryLabels[post.postCategory]}</BackButton>
       </Header>
 
       <ContentWrapper>
         <Post>
           <UserInfo>
-            <ProfileImage src={post.writerProfileImgUrl || defImg} alt="프로필" />
+            <ProfileImage
+              src={post.writerProfileImgUrl || defImg}
+              alt="프로필"
+            />
             <div className="info">
               <div className="name">{post.writerName}</div>
               <div className="date">
@@ -207,6 +228,7 @@ const MainDetail: React.FC = () => {
               onReplyClick={setReplyTarget}
               postId={Number(postId)}
               onRefresh={fetchPostDetail}
+              isPostOwner={isPostOwner}
             />
           </CommentList>
         </Post>
@@ -214,16 +236,23 @@ const MainDetail: React.FC = () => {
 
       <CommentInput>
         <label>
-          <input
-            type="checkbox"
-            checked={isSecret}
-            onChange={(e) => setIsSecret(e.target.checked)}
-          />
-          비밀
+          {!replyTarget && (
+            <>
+              <input
+                type="checkbox"
+                checked={isSecret}
+                onChange={(e) => setIsSecret(e.target.checked)}
+              />
+              비밀
+            </>
+          )}
         </label>
+        
         <input
           type="text"
-          placeholder={replyTarget ? "답글을 입력해주세요." : "댓글을 입력해주세요."}
+          placeholder={
+            replyTarget ? "답글을 입력해주세요." : "댓글을 입력해주세요."
+          }
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
         />
