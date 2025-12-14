@@ -31,6 +31,7 @@ interface PostData {
 
 interface CommentData {
   id: number;
+  currentUserId: number;
   writerId: number;
   writerName: string;
   writerProfileImgUrl: string;
@@ -51,7 +52,7 @@ const categoryLabels: { [key: string]: string } = {
   FREE_BOARD: "자유게시판",
   WORKOUT_INFO: "정보게시판",
   WORKOUT_MATE: "메이트게시판",
-}
+};
 
 const addReplyRecursively = (
   comments: CommentData[],
@@ -82,18 +83,19 @@ const MainDetail: React.FC = () => {
   const [isSecret, setIsSecret] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  
+  const [localUserId, setLocalUserId] = useState<number | null>(null);
 
   useEffect(() => {
     if (replyTarget) {
       setIsSecret(false);
     }
-  }, [replyTarget])
+  }, [replyTarget]);
 
   useEffect(() => {
-    const storedId = localStorage.getItem("userId"); 
+    const storedId = localStorage.getItem("userId");
     if (storedId) {
-      setCurrentUserId(Number(storedId));
+      setLocalUserId(Number(storedId));
     }
   }, []);
 
@@ -101,11 +103,13 @@ const MainDetail: React.FC = () => {
     if (!postId) return;
 
     try {
-      const res = await axiosInstance.get<PostDetailResponse>(`/api/v2/posts/${postId}`);
-
+      const res = await axiosInstance.get<PostDetailResponse>(
+        `/api/v2/posts/${postId}`
+      );
+      
       setPost(res.data.post);
-
       setComments(res.data.comments ?? []);
+
     } catch (err) {
       console.error(err);
       setError("게시글을 불러오지 못했습니다.");
@@ -114,7 +118,7 @@ const MainDetail: React.FC = () => {
     }
   }, [postId]);
 
-  const isPostOwner = post ? post.writerId === currentUserId : false;
+  const isHeaderPostOwner = post ? post.writerId === localUserId : false;
 
   useEffect(() => {
     if (!postId) {
@@ -148,7 +152,7 @@ const MainDetail: React.FC = () => {
       await axiosInstance.delete(`/api/v2/posts/${postId}`);
       alert("게시글이 삭제됐습니다.");
       navigate(-1);
-    } catch(error) {
+    } catch (error) {
       alert("게시글 삭제를 실패했습니다.");
     }
   };
@@ -162,11 +166,17 @@ const MainDetail: React.FC = () => {
         {
           contents: newComment,
           rootId: replyTarget ?? 0,
-          isSecret: replyTarget ? false : isSecret, 
+          isSecret: replyTarget ? false : isSecret,
         }
       );
 
-      const newCommentData = { ...res.data, isMine: true };
+      const myId = localUserId ?? 0;
+      const newCommentData = { 
+        ...res.data, 
+        currentUserId: myId, 
+        writerId: myId,
+        isMine: post ? post.writerId === myId : false 
+      };
 
       setComments((prev) => {
         if (replyTarget) {
@@ -213,7 +223,10 @@ const MainDetail: React.FC = () => {
               </div>
             </div>
 
-            <MoreMenu onReport={handlePostReport} onDelete={handlePostDelete} />
+            <MoreMenu
+              onReport={handlePostReport}
+              onDelete={isHeaderPostOwner ? handlePostDelete : undefined}
+            />
           </UserInfo>
 
           <PostText>
@@ -228,7 +241,6 @@ const MainDetail: React.FC = () => {
               onReplyClick={setReplyTarget}
               postId={Number(postId)}
               onRefresh={fetchPostDetail}
-              isPostOwner={isPostOwner}
             />
           </CommentList>
         </Post>
@@ -247,7 +259,7 @@ const MainDetail: React.FC = () => {
             </>
           )}
         </label>
-        
+
         <input
           type="text"
           placeholder={

@@ -13,6 +13,7 @@ import defImg from "../../assets/images/default_profileImage.png";
 
 interface CommentData {
   id: number;
+  currentUserId: number;
   writerId: number;
   writerName: string;
   writerProfileImgUrl: string | null;
@@ -30,7 +31,6 @@ interface DetailCommentProps {
   userProfileImgUrl?: string;
   postId: number;
   onRefresh: () => void;
-  isPostOwner: boolean;
 }
 
 const SingleCommentItem: React.FC<{
@@ -40,11 +40,13 @@ const SingleCommentItem: React.FC<{
   userProfileImgUrl?: string;
   postId: number;
   onRefresh: () => void;
-  isPostOwner: boolean;
-}> = ({ comment, depth, onReplyClick, userProfileImgUrl, postId, onRefresh, isPostOwner }) => {
+}> = ({ comment, depth, onReplyClick, userProfileImgUrl, postId, onRefresh }) => {
   const safeDepth = Math.min(depth, 1);
 
-  const canShowContent = !comment.isSecret || comment.isMine || isPostOwner;
+  const isPostOwner = comment.isMine; 
+  const isCommentWriter = comment.currentUserId === comment.writerId;
+  
+  const canShowContent = !comment.isSecret || isPostOwner || isCommentWriter;
 
   const handleReport = async () => {
     if (!window.confirm("이 댓글을 신고하시겠습니까?")) return;
@@ -78,8 +80,7 @@ const SingleCommentItem: React.FC<{
       <CommentItemWrapper $depth={safeDepth}>
         <ProfileImageSmall
           src={
-            comment.writerProfileImgUrl ||
-            (comment.isMine ? userProfileImgUrl || defImg : defImg)
+            comment.writerProfileImgUrl || defImg
           }
           alt="댓글자"
         />
@@ -93,6 +94,7 @@ const SingleCommentItem: React.FC<{
                   day: "2-digit",
                   hour: "2-digit",
                   minute: "2-digit",
+
                 })}
               </span>
               {comment.isSecret && (
@@ -104,8 +106,10 @@ const SingleCommentItem: React.FC<{
                 />
               )}
             </div>
-
-            <MoreMenu onReport={handleReport} onDelete={handleDelete} />
+            <MoreMenu
+              onReport={handleReport}
+              onDelete={isCommentWriter ? handleDelete : undefined}
+            />
           </div>
 
           {canShowContent ? (
@@ -142,7 +146,6 @@ const SingleCommentItem: React.FC<{
               userProfileImgUrl={userProfileImgUrl}
               postId={postId}
               onRefresh={onRefresh}
-              isPostOwner={isPostOwner}
             />
           ))}
         </ReplyContainer>
@@ -157,7 +160,6 @@ const DetailComment: React.FC<DetailCommentProps> = ({
   userProfileImgUrl,
   postId,
   onRefresh,
-  isPostOwner,
 }) => {
   if (!comments || comments.length === 0)
     return <EmptyComment>아직 댓글이 없습니다.</EmptyComment>;
@@ -173,7 +175,6 @@ const DetailComment: React.FC<DetailCommentProps> = ({
           userProfileImgUrl={userProfileImgUrl}
           postId={postId}
           onRefresh={onRefresh}
-          isPostOwner={isPostOwner}
         />
       ))}
     </>
