@@ -5,7 +5,7 @@ import SirenIcon from "../../../assets/images/Siren.svg";
 
 interface MoreMenuProps {
   onReport: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
 }
 
 const MoreMenu: React.FC<MoreMenuProps> = ({ onReport, onDelete }) => {
@@ -23,9 +23,12 @@ const MoreMenu: React.FC<MoreMenuProps> = ({ onReport, onDelete }) => {
             <img src={SirenIcon} alt="신고" />
             신고
           </PopupItem>
-          <PopupItem onClick={() => { onDelete(); setIsOpen(false); }} $isDelete>
-            삭제하기
-          </PopupItem>
+          
+          {onDelete && (
+            <PopupItem onClick={() => { onDelete(); setIsOpen(false); }} $isDelete>
+              삭제하기
+            </PopupItem>
+          )}
         </PopupMenu>
       )}
     </MenuWrapper>
