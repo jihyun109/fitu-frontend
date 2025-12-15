@@ -3,19 +3,32 @@ import styled from "styled-components";
 import BackButton from "../../components/BackButton";
 import SelectBox from "./components/SelectBox";
 import ExerciseBTN from "./components/ExerciseBTN";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../apis/axiosInstance";
 const ExercisePage = () => {
   const [exerciseArea, setExerciseArea] = useState<string[]>([]);
-  console.log(exerciseArea);
+  const navigate = useNavigate();
+  const handleRecommend = async () => {
+    try {
+      const res = await axiosInstance.post("/workout/recommendations", {
+        workoutCategoryList: exerciseArea,
+      });
+
+      navigate("/exercise/list", res.data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return (
     <Container>
       <BackButton />
-     
+
       <p style={{ marginTop: "50px" }}>운동할 부위를</p>
       <p>골라주세요!</p>
-       <Layout>
+      <Layout>
         <SelectBox selected={exerciseArea} onChange={setExerciseArea} />
-        </Layout>
-        <ExerciseBTN />
+      </Layout>
+      <ExerciseBTN onRecommend={handleRecommend} />
     </Container>
   );
 };
@@ -42,7 +55,7 @@ const Layout = styled.div`
   flex: 1;
   justify-content: space-between;
   flex-direction: column;
-   align-items: center;
+  align-items: center;
   width: 100%;
   box-sizing: border-box;
 `;
