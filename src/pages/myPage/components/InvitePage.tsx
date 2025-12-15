@@ -70,7 +70,6 @@ export default function InvitePage() {
         setMyCode(res.data.friendCode || "");
       } catch (err) {
         console.error("초대 코드 불러오기 실패:", err);
-        alert("초대 코드를 불러오지 못했습니다.");
       }
     };
 
@@ -86,12 +85,34 @@ export default function InvitePage() {
   const addFriendCode = async () => {
     if (!friendCode.trim()) return alert("코드를 입력하세요.");
 
+    const token = sessionStorage.getItem("Authorization");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
     try {
-      alert(`친구 초대 코드 ${friendCode} 추가 요청`);
+      alert(`친구 추가 중...`);
+      
+      const response = await axiosInstance.post(
+        "/friend",
+        { code: friendCode },
+        {
+          headers: {
+            Authorization: token
+          }
+        }
+      );
+      
+      const message = response.data.message || "친구가 성공적으로 추가되었습니다.";
+      alert(message);
       setFriendCode("");
-    } catch (err) {
+      
+    } catch (err: any) {
       console.error("친구 추가 에러:", err);
-      alert("친구 초대에 실패했습니다.");
+      
+      const errorMessage = err.response?.data?.message || "친구 초대에 실패했습니다.";
+      alert(errorMessage);
     }
   };
 

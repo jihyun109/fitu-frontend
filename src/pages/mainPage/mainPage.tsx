@@ -44,7 +44,12 @@ const MainPage = () => {
         params: { category: selectedCategory, page: pageNum },
       });
       const data = res.data;
-      setUniName(res.data.universityName)
+      const uniNameFromApi = res.data.universityName;
+      setUniName(uniNameFromApi);
+      
+      if (uniNameFromApi) {
+        sessionStorage.setItem("universeName", uniNameFromApi);
+      }
       if (pageNum === 0) setPosts(data.content);
       else setPosts((prev) => [...prev, ...data.content]);
       setHasNext(data.hasNext);

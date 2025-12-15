@@ -10,13 +10,18 @@ export interface Friend {
 
 interface FriendListProps {
   friends: Friend[];
+  onFriendClick: (id: number, name: string) => void;
 }
 
-const FriendList: React.FC<FriendListProps> = ({ friends }) => {
+const FriendList: React.FC<FriendListProps> = ({ friends, onFriendClick }) => {
   return (
     <FriendsListContainer>
       {friends.map((friend) => (
-        <FriendItem key={friend.id}>
+        <FriendItem 
+          key={friend.id} 
+          onClick={() => onFriendClick(friend.id, friend.name)}
+          style={{ cursor: 'pointer' }}
+        >
           <ProfileAvatar>
             <img src={friend.profileImage || defaultImage} alt={`${friend.name} 프로필`} />
           </ProfileAvatar>
@@ -46,6 +51,9 @@ const FriendItem = styled.div`
   align-items: center;
   min-width: 60px;
   gap: 8px;
+  &:active {
+    opacity: 0.7;
+  }
 `;
 
 const ProfileAvatar = styled.div`
