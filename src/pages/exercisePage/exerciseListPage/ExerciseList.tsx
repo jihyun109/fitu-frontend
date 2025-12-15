@@ -69,9 +69,21 @@ const ExerciseList = () => {
     if (imageFile) {
       formData.append("image", imageFile);
     }
-    await axiosInstance.post("/api/v2/workouts/sessions/end", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    try {
+      const res = await axiosInstance.post(
+        "/api/v2/workouts/sessions/end",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      if (res.status === 200) {
+        alert("운동 기록이 저장되었습니다.");
+        navigate("/home");
+      }
+    } catch (e) {
+      console.log(e);
+    }
     console.log(payload);
   };
 
@@ -139,6 +151,8 @@ const ListWrapper = styled.div`
   flex-direction: column;
   gap: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const CustomBTN = styled.button`
@@ -171,7 +185,7 @@ const ImageLabel = styled.label`
   width: 100%;
   padding: 12px 0;
   border-radius: 8px;
-  border: 1px solid #007AFF;
+  border: 1px solid #007aff;
   text-align: center;
   font-size: 14px;
   cursor: pointer;

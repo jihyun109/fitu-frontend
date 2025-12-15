@@ -5,7 +5,7 @@ import Header from "./components/Header";
 import Categories from "./components/Categories";
 import ExerciseList from "./components/ExerciseList";
 import axiosInstance from "../../../apis/axiosInstance";
-
+import { useNavigate } from "react-router-dom";
 type ThumbItem = { id: string; name: string; imgUrl?: string };
 type ExerciseItem = {
   workoutId: string;
@@ -17,6 +17,7 @@ const CustomPage = () => {
   const [category, setCategory] = useState("shoulder");
   const [thumbs, setThumbs] = useState<ThumbItem[]>([]);
   const [exercises, setExercises] = useState<ExerciseItem[]>([]);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchExercises = async () => {
       try {
@@ -46,6 +47,17 @@ const CustomPage = () => {
     setThumbs((prev) => prev.filter((p) => p.id !== id));
   };
 
+  const handleSubmit = async() => {
+    const workoutIds = thumbs.map((thumb) => thumb.id);
+   try{
+    const res = await axiosInstance.post("/workout/custom/result",{workoutIds});
+    navigate("/exercise/list",{state:res.data});
+    console.log(res.data);
+   }catch(e){
+    console.log(e);
+   }
+  }
+
   return (
     <Container>
       <BackButton />
@@ -56,7 +68,7 @@ const CustomPage = () => {
       <Main>
         <ExerciseList onAdd={addThumb} exercises={exercises} />
       </Main>
-      <StyledButton disabled={thumbs.length === 0}>운동하기</StyledButton>
+      <StyledButton disabled={thumbs.length === 0} onClick={handleSubmit}>운동하기</StyledButton>
     </Container>
   );
 };
