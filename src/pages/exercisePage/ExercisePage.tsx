@@ -9,6 +9,10 @@ const ExercisePage = () => {
   const [exerciseArea, setExerciseArea] = useState<string[]>([]);
   const navigate = useNavigate();
   const handleRecommend = async () => {
+    if (exerciseArea.length === 0) {
+      alert("운동 부위를 최소 1개 이상 선택해주세요!");
+      return;
+    }
     try {
       const res = await axiosInstance.post("/workout/recommendations", {
         workoutCategoryList: exerciseArea,
