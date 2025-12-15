@@ -151,6 +151,8 @@ const ListWrapper = styled.div`
   flex-direction: column;
   gap: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const CustomBTN = styled.button`
