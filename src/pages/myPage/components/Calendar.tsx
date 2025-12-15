@@ -8,32 +8,31 @@ import {
   CalendarGlobalStyle,
   CalendarWrapper,
   DayPickerWrapper,
-  WorkoutListWrapper,
+  RecordListWrapper,
+  RecordCard,
+  RecordInfo,
+  RecordImage,
+  DateTitle,
+  Seperator,
 } from "./styles/Calendar.styled";
 import axiosInstance from "../../../apis/axiosInstance";
 
-type WorkoutDetail = {
-  name: string;
-  categoryId: number;
-  sets: number;
-  weight: number;
-  repsPerSet: number;
-};
-
-type WorkoutRecord = {
+type CalendarRecord = {
   date: string;
-  workout: WorkoutDetail[];
+  categoryId: number;
+  categoryName: string;
+  dailyPhoto: string | null;
 };
 
 type CalendarProps = {
-  records: WorkoutRecord[];
+  records?: any[]; 
   month: Date;
   onMonthChange: (date: Date) => void;
 };
 
-export default function Calendar({ records, month, onMonthChange }: CalendarProps) {
+export default function Calendar({ month, onMonthChange }: CalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [fetchedRecords, setFetchedRecords] = useState<WorkoutRecord[]>([]);
+  const [fetchedRecords, setFetchedRecords] = useState<CalendarRecord[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,23 +45,10 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
         const monthParam = month.getMonth() + 1;
 
         const response = await axiosInstance.get(
-          `/api/workout/calendar/full?year=${year}&month=${monthParam}`,
+          `/api/v2/workouts/calendar/full?year=${year}&month=${monthParam}`
         );
 
-        const data = response.data;
-
-        const formatted: WorkoutRecord[] = data.map((item: any) => ({
-          date: item.date,
-          workout: (item.details ?? []).map((w: any) => ({
-            name: w.name,
-            categoryId: w.categoryId,
-            sets: w.sets,
-            weight: w.weight,
-            repsPerSet: w.repsPerSet,
-          })),
-        }));
-
-        setFetchedRecords(formatted);
+        setFetchedRecords(response.data);
       } catch (error) {
         console.error("캘린더 운동 데이터 불러오기 실패:", error);
       }
@@ -70,28 +56,22 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
 
     fetchCalendarData();
   }, [month]);
-
-  const finalRecords = fetchedRecords.length > 0 ? fetchedRecords : records;
-
-  const recordsMap = new Map<string, WorkoutRecord["workout"]>();
-  finalRecords.forEach(({ date, workout }) => {
-    recordsMap.set(date, workout);
-  });
+  const recordedDates = new Set(fetchedRecords.map((r) => r.date));
 
   const year = month.getFullYear();
   const monthIndex = month.getMonth();
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-
   const allDatesInMonth = Array.from({ length: daysInMonth }, (_, i) => {
     const date = new Date(year, monthIndex, i + 1);
     return format(date, "yyyy-MM-dd");
   });
-
-  const recordedDates = new Set(finalRecords.map((r) => r.date));
+  
   const noRecordDates = allDatesInMonth.filter((d) => !recordedDates.has(d));
 
   const selectedKey = format(selectedDate, "yyyy-MM-dd");
-  const selectedWorkouts = recordsMap.get(selectedKey) || [];
+  const selectedDailyRecords = fetchedRecords.filter(
+    (r) => r.date === selectedKey
+  );
 
   return (
     <CalendarWrapper>
@@ -116,35 +96,32 @@ export default function Calendar({ records, month, onMonthChange }: CalendarProp
         />
       </DayPickerWrapper>
 
-      <div
-        style={{
-          width: "150%",
-          height: "10px",
-          backgroundColor: "#F2F4F5",
-          marginTop: "30px",
-        }}
-      />
+      <Seperator />
 
-      <WorkoutListWrapper>
-        <p>{selectedKey}</p>
-        {selectedWorkouts.length > 0 ? (
-          <ul>
-            {selectedWorkouts.map((item, index) => (
-              <li
-                key={index}
-                style={{ cursor: "pointer" }}
-                onClick={() =>
-                  navigate(`/record/${selectedKey}`, { state: { workout: item } })
-                }
-              >
-                {item.name} <br /> {item.sets}세트, {item.weight}kg, {item.repsPerSet}회
-              </li>
-            ))}
-          </ul>
+      <RecordListWrapper>
+        <DateTitle>{format(selectedDate, "MM.dd")}</DateTitle>
+        
+        {selectedDailyRecords.length > 0 ? (
+          selectedDailyRecords.map((record, index) => (
+            <RecordCard
+              key={index}
+              onClick={() =>
+                navigate(`/record/${selectedKey}`, { state: { record } })
+              }
+            >
+              <RecordInfo>
+                <span className="label">운동</span>
+                <span className="details">{record.categoryName}</span>
+              </RecordInfo>
+              <RecordImage $bgImage={record.dailyPhoto}>
+                 {!record.dailyPhoto && "사진 없음"}
+              </RecordImage>
+            </RecordCard>
+          ))
         ) : (
-          <p>운동 기록 없음</p>
+          <p style={{ color: "#999", marginTop: "20px" }}>운동 기록이 없습니다.</p>
         )}
-      </WorkoutListWrapper>
+      </RecordListWrapper>
     </CalendarWrapper>
   );
 }

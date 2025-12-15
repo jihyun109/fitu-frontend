@@ -7,13 +7,11 @@ export const Container = styled.div`
   overflow-x: hidden;
 `;
 
-// 상단
 export const TopSection = styled.div`
   display: flex;
   width: 80%;
 `;
 
-// 신체 정보
 export const BodyInfoSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -50,11 +48,10 @@ export const Button = styled.button`
   border: 2px;
   border-radius: 8px;
   width: 100%;
-  margin-top: 16px; // 4%정도
+  margin-top: 16px;
   padding-bottom: 10px;
 `;
 
-// 그래프 모달
 export const ModalBackdrop = styled.div`
   position: fixed;
   inset: 0;
