@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-const Header = () => {
-  const [thumbs, setThumbs] = useState(["운동1", "운동2", "운동3", "운동4", "운동5"]);
-
-  const removeThumb = (index: number) => {
-    setThumbs((prev) => prev.filter((_, i) => i !== index));
-  };
+type ThumbItem = { id: string; name: string; thumbnail?: string };
+const Header =  ({ thumbs, onRemove }: { thumbs: ThumbItem[]; onRemove: (id: string) => void }) => {
 
   return (
     <Container>
@@ -14,10 +10,10 @@ const Header = () => {
         {thumbs.map((item, i) => (
           <Thumb key={i}>
             <ThumbWrapper>
-              <ThumbCircle />
-              <DeleteBtn onClick={() => removeThumb(i)}>×</DeleteBtn>
+              <ThumbCircle ><img src={item.thumbnail} style={{width:'100%', height:'100%'}}/></ThumbCircle>
+              <DeleteBtn onClick={() =>onRemove(item.id)}>×</DeleteBtn>
             </ThumbWrapper>
-            <ThumbLabel>{item}</ThumbLabel>
+            <ThumbLabel>{item.name}</ThumbLabel>
           </Thumb>
         ))}
       </Thumbs>
@@ -31,15 +27,18 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 80px;
+  margin-top: 40px;
+  overflow-x: auto;
+   scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Thumbs = styled.div`
   display: flex;
   gap: 12px;
-  overflow-x: auto;
   padding-bottom: 6px;
-  overflow-y: visible;
 `;
 
 const Thumb = styled.div`

@@ -1,23 +1,25 @@
-import React from "react";
+import React,{useEffect, useState} from "react";
 import styled from "styled-components";
 
-const EXERCISES = [
-  { name: "운동명", desc: "운동설명명" },
-  { name: "운동명", desc: "운동설명명" },
-  { name: "운동명", desc: "운동설명명" },
-  { name: "운동명", desc: "운동설명명" },
-  { name: "운동명", desc: "운동설명명" },
+type ExItem = { id: string; name: string; thumbnail?: string };
+type ExerciseItem = {workoutId: string; workoutName: string, imageUrl?: string, description?: string}; 
+
+const MOCK: ExItem[] = [
+  { id: "m1", name: "운동명 A" },
+  { id: "m2", name: "운동명 B" },
+  { id: "m3", name: "운동명 C" },
+  { id: "m4", name: "운동명 D" },
 ];
 
-const ExerciseList = () => {
+const ExerciseList = ({ exercises, onAdd }: { exercises: ExerciseItem[]; onAdd: (it: ExItem) => void }) => {
   return (
-    <ListContainer>
-      {EXERCISES.map((item, i) => (
-        <ExerciseItem key={i}>
-          <ImageBox>그림</ImageBox>
+  <ListContainer>
+      {exercises.map((item) => (
+        <ExerciseItem key={item.workoutId} onClick={() => onAdd({ id: item.workoutId, name: item.workoutName, thumbnail: item.imageUrl })}>
+          <ImageBox>{item.imageUrl ? <img src={item.imageUrl} alt={item.workoutName} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "그림"}</ImageBox>
           <Info>
-            <Title>{item.name}</Title>
-            <Desc>{item.desc}</Desc>
+            <Title>{item.workoutName}</Title>
+            <Desc>{item.description}</Desc>
           </Info>
         </ExerciseItem>
       ))}
@@ -46,11 +48,9 @@ const ImageBox = styled.div`
   height: 56px;
   background: #f5f5f5;
   border: 1px solid #e3e3e3;
-  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 14px;
   color: #444;
 `;
