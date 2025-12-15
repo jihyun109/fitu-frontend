@@ -14,7 +14,9 @@ const ExercisePage = () => {
         workoutCategoryList: exerciseArea,
       });
 
-      navigate("/exercise/list", res.data);
+      navigate("/exercise/list", {
+        state: res.data,
+      });
     } catch (e) {
       console.error(e);
     }

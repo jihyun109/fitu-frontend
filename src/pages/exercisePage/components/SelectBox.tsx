@@ -16,11 +16,11 @@ type LabelProps = {
 };
 
 const BodyPart: Option[] = [
-  { label: '어깨', value: 'shoulder' },
-  { label: '가슴', value: 'chest' },
-  { label: '등', value: 'back' },
-  { label: '팔', value: 'arm' },
-  { label: '하체', value: 'leg' },
+  { label: '어깨', value: 'SHOULDER' },
+  { label: '가슴', value: 'CHEST' },
+  { label: '등', value: 'BACK' },
+  { label: '팔', value: 'ARM' },
+  { label: '하체', value: 'LOWER_PART' },
 ];
 
 const SelectBox: React.FC<SelectBoxProps> = ({ selected, onChange }) => {
