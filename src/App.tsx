@@ -19,6 +19,7 @@ import CustomPage from "./pages/exercisePage/customPage/customPage";
 import ChatPage from "./pages/chatPage/chatPage";
 import ChatRoom from "./pages/chatPage/chatRoom";
 import ExerciseList from "./pages/exercisePage/exerciseListPage/ExerciseList";
+import Request from "./pages/request/Request";
 function App() {
   return (
     <div className="App">
@@ -44,6 +45,7 @@ function App() {
         <Route path="/chatlist" element={<ChatPage/>} />
         <Route path="/chatlist/:roomId" element={<ChatRoom />} />
         <Route path="/exercise/list" element={<ExerciseList/>} />
+        <Route path="/request" element={<Request/>} />
       </Routes>
     </div>
   );
