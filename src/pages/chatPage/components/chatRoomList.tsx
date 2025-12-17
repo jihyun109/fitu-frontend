@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import defaultImage from '../../../assets/images/default_profileImage.png';
 
 export interface ChatRoom {
   id: number;
   name: string;
   lastMessage: string;
-  profileImage?: string;
+  profileImage: string;
 }
 
 interface ChatRoomListProps {
@@ -15,69 +14,83 @@ interface ChatRoomListProps {
 }
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ chatRooms, onRoomClick }) => {
+  if (chatRooms.length === 0) {
+    return <EmptyMessage>진행 중인 채팅이 없습니다.</EmptyMessage>;
+  }
+
   return (
-    <ChatListContainer>
-      {chatRooms.map((chat) => (
-        <ChatListItem key={chat.id} onClick={() => onRoomClick(chat.id)}>
-          <ProfileAvatar>
-            <img src={chat.profileImage || defaultImage} alt={`${chat.name} 프로필`} />
-          </ProfileAvatar>
-          <ChatTextContainer>
-            <ChatName>{chat.name}</ChatName>
-            <LastMessage>{chat.lastMessage}</LastMessage>
-          </ChatTextContainer>
-        </ChatListItem>
+    <ListContainer>
+      {chatRooms.map((room) => (
+        <RoomItem key={room.id} onClick={() => onRoomClick(room.id)}>
+          <ProfileImage src={room.profileImage} alt={room.name} />
+          <RoomInfo>
+            <RoomName>{room.name}</RoomName>
+            <LastMessage>{room.lastMessage}</LastMessage>
+          </RoomInfo>
+        </RoomItem>
       ))}
-    </ChatListContainer>
+    </ListContainer>
   );
 };
 
 export default ChatRoomList;
 
-const ChatListContainer = styled.div`
+const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
 `;
 
-const ChatListItem = styled.div`
+const RoomItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
-  &:hover { background-color: #f9f9f9; }
-`;
 
-const ProfileAvatar = styled.div`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  overflow: hidden;
-  flex-shrink: 0;
-
-  & > img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: #fafafa;
   }
 `;
 
-const ChatTextContainer = styled.div`
+const ProfileImage = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 1px solid #eee;
+`;
+
+const RoomInfo = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  overflow: hidden;
 `;
 
-const ChatName = styled.span`
-  font-size: 16px; 
+const RoomName = styled.div`
   font-weight: 600;
-  color: #000;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 4px;
 `;
 
-const LastMessage = styled.span`
-  font-size: 14px; 
-  color: #555;
+const LastMessage = styled.div`
+  font-size: 13px;
+  color: #888;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const EmptyMessage = styled.div`
+  padding: 40px 0;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
 `;

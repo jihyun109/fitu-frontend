@@ -8,43 +8,56 @@ import ChatRoomList, { ChatRoom } from './components/chatRoomList';
 import defaultImage from '../../assets/images/default_profileImage.png';
 import axiosInstance from '../../apis/axiosInstance';
 
-const dummyChatRooms: ChatRoom[] = [
-  { id: 1, name: '김주민', lastMessage: '오늘 운동 몇시에 가?', profileImage: defaultImage },
-];
-
 interface FriendResponse {
   userId: number;
   userName: string;
   profileImageUrl: string | null;
 }
 
+interface ChatRoomResponse {
+  roomId: number;
+  roomName: string;
+  lastMessage: string;
+  imgUrl: string | null;
+}
+
 const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
 
   useEffect(() => {
-    const fetchFriends = async () => {
+    const fetchData = async () => {
       const token = sessionStorage.getItem("Authorization");
       if (!token) return;
 
+      const headers = { Authorization: token };
+
       try {
-        const response = await axiosInstance.get('/friend', {
-          headers: { Authorization: token }
-        });
-        
-        const friendList = response.data.friendInfoList.map((f: FriendResponse) => ({
+        const friendRes = await axiosInstance.get('/friend', { headers });
+        const friendList = friendRes.data.friendInfoList.map((f: FriendResponse) => ({
           id: f.userId,
           name: f.userName,
           profileImage: f.profileImageUrl || defaultImage
         }));
-
         setFriends(friendList);
+
+        const roomRes = await axiosInstance.get('/api/v2/chat/room/list', { headers });
+        
+        const roomList = roomRes.data.chatRoomList.map((r: ChatRoomResponse) => ({
+          id: r.roomId,
+          name: r.roomName,
+          lastMessage: r.lastMessage,
+          profileImage: r.imgUrl || defaultImage
+        }));
+        setChatRooms(roomList);
+
       } catch (error) {
-        console.error("친구 목록 불러오기 실패:", error);
+        console.error("데이터 불러오기 실패:", error);
       }
     };
 
-    fetchFriends();
+    fetchData();
   }, []);
 
   const handleFriendClick = async (friendId: number, friendName: string) => {
@@ -60,9 +73,7 @@ const ChatPage: React.FC = () => {
           name: friendName, 
           memberIds: [friendId]
         },
-        {
-          headers: { Authorization: token }
-        }
+        { headers: { Authorization: token } }
       );
 
       if (response.data && response.data.id) {
@@ -70,7 +81,6 @@ const ChatPage: React.FC = () => {
       } else {
         console.error("채팅방 ID 응답 없음");
       }
-
     } catch (error) {
       console.error("채팅방 생성 실패:", error);
       alert("채팅방 생성 중 오류가 발생했습니다.");
@@ -99,7 +109,7 @@ const ChatPage: React.FC = () => {
         <Section>
           <SectionTitle>채팅</SectionTitle>
           <ChatRoomList 
-            chatRooms={dummyChatRooms} 
+            chatRooms={chatRooms} 
             onRoomClick={handleRoomClick} 
           />
         </Section>
