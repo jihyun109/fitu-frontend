@@ -9,9 +9,9 @@ const Header: React.FC<HeaderProps> = ({ onChange }) => {
   const [selected, setSelected] = useState<string>("");
 
   const list = [
-    { label: "벤치프레스", value: "benchpress" },
-    { label: "데드리프트", value: "deadlift" },
-    { label: "스쿼트", value: "squat" },
+    { label: "벤치프레스", value: "BENCH_PRESS" },
+    { label: "데드리프트", value: "DEADLIFT" },
+    { label: "스쿼트", value: "SQUAT" },
   ];
 
   const handleClick = (value: string) => {

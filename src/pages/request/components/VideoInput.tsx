@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import VideoIcon from "../../../assets/images/video.png";
+interface VideoInputProps {
+  setVideoFile: (file: File | null) => void;
+}
 
-const VideoInput = () => {
+const VideoInput = ({ setVideoFile }: VideoInputProps) => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -11,7 +14,7 @@ const VideoInput = () => {
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+    setVideoFile(file);
     const url = URL.createObjectURL(file);
     setVideoUrl(url);
   };
@@ -32,7 +35,7 @@ const handleDelete = (e: React.MouseEvent) => {
 
   setIsPlaying(false);
   setVideoUrl(null);
-
+  setVideoFile(null);
   if (fileInputRef.current) {
     fileInputRef.current.value = "";
   }
