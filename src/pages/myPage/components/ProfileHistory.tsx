@@ -10,7 +10,11 @@ interface ProfileHistoryProps {
 }
 
 interface HistoryItem {
-  url: string;
+  imageUrl: string; 
+}
+
+interface HistoryResponse {
+  profileImages: HistoryItem[];
 }
 
 export default function ProfileHistory({ onClose, onImageChange }: ProfileHistoryProps) {
@@ -25,13 +29,15 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       if (!token) return;
 
       try {
-        const res = await axiosInstance.get<HistoryItem[]>('/api/v2/profile-image/history', {
+        const res = await axiosInstance.get<HistoryResponse>('/api/v2/profile-image/history', {
           headers: { Authorization: token },
         });
         
-        const validUrls = res.data
-          .filter(item => item.url && item.url.trim() !== "")
-          .map(item => item.url);
+        const list = res.data.profileImages || [];
+
+        const validUrls = list
+          .filter(item => item.imageUrl && item.imageUrl.trim() !== "")
+          .map(item => item.imageUrl);
 
         setHistoryImages(validUrls);
         
@@ -78,7 +84,8 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
         },
       });
 
-      const newUrl = res.data.imageUrl || DefaultProfile;
+      const newUrl = res.data.imageUrl || res.data.url || DefaultProfile; 
+      
       const updated = [newUrl, ...historyImages].slice(0, 10);
       setHistoryImages(updated);
       onImageChange(newUrl);
@@ -107,12 +114,7 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       });
       const updated = historyImages.filter((url) => url !== imgUrl);
       setHistoryImages(updated);
-
-      if (selectedImage === imgUrl) {
-         const fallback = updated.length > 0 ? updated[0] : DefaultProfile;
-         onImageChange(fallback);
-      }
-
+      
     } catch (err) {
       console.error("이미지 삭제 에러:", err);
       alert("이미지 삭제에 실패했습니다.");

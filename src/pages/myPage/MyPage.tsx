@@ -18,6 +18,8 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import { DeleteAccountModal } from "./components/DeleteAccount";
+import axiosInstance from "../../apis/axiosInstance";
+import { useProfileImage } from "../../hooks/useProfileImage";
 
 type WorkoutDetail = {
   name: string;
@@ -43,14 +45,14 @@ export default function MyPage() {
     userName: "",
   });
 
-  const [profileImg, setProfileImg] = useState<string>(Profile);
+  const { profileImg, setProfileImg } = useProfileImage();
   const [showHistory, setShowHistory] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   const handleDeleteConfirm = () => {
-  setShowDeleteModal(false);
-  alert("회원탈퇴 요청 실행 (실제 호출 x)");
-};
+    setShowDeleteModal(false);
+    alert("회원탈퇴 요청 실행 (실제 호출 x)");
+  };
 
   useEffect(() => {
     const recentBodyData = async () => {
@@ -58,11 +60,11 @@ export default function MyPage() {
       if (!token) return;
 
       try {
-        const res = await fetch("https://hanseifitu.shop/api/v2/physical-infos", {
-          headers: { Authorization: `${token}` },
+        const res = await axiosInstance.get("/api/v2/physical-infos", {
+          headers: { Authorization: token },
         });
-        if (!res.ok) throw new Error("최신 신체 정보 get 실패");
-        const data = await res.json();
+        
+        const data = res.data;
         setBodyData({
           height: data.height?.toString() || "",
           weight: data.weight?.toString() || "",
@@ -71,7 +73,7 @@ export default function MyPage() {
           userName: data.userName || "",
         });
       } catch (error) {
-        console.error("신체 정보 조회 에러:", error);
+        console.error(error);
       }
     };
     recentBodyData();
@@ -81,6 +83,7 @@ export default function MyPage() {
     const numeric = value.replace(/[^0-9]/g, "");
     setBodyData((prev) => ({ ...prev, [id]: numeric }));
   };
+  
 
   const saveLogic = async () => {
     const token = sessionStorage.getItem("Authorization");
@@ -94,19 +97,15 @@ export default function MyPage() {
     };
 
     try {
-      const res = await fetch("https://hanseifitu.shop/api/v2/physical-infos", {
-        method: "POST",
+      await axiosInstance.post("/api/v2/physical-infos", payload, {
         headers: {
-          Authorization: `${token}`,
+          Authorization: token,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("저장 실패");
       alert("수정 완료되었습니다!");
-      console.log("저장된 데이터:", payload);
     } catch (err) {
-      console.error("저장 에러:", err);
+      console.error(err);
       alert("저장에 실패했습니다.");
     }
   };
@@ -117,14 +116,14 @@ export default function MyPage() {
       if (!token) return;
 
       try {
-        const res = await fetch("https://hanseifitu.shop/api/v2/profile-image", {
-          headers: { Authorization: `${token}` },
+        const res = await axiosInstance.get("/api/v2/profile-image", {
+          headers: { Authorization: token },
         });
-        if (!res.ok) throw new Error("이미지 불러오기 실패");
-        const data = await res.json();
-        setProfileImg(data.imageUrl?.trim() || Profile);
+        
+        const imgUrl = res.data.imageUrl;
+        setProfileImg(imgUrl ? imgUrl.trim() : Profile);
       } catch (err) {
-        console.error("프로필 이미지 에러:", err);
+        console.error(err);
         setProfileImg(Profile);
       }
     };
