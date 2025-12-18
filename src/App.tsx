@@ -9,10 +9,17 @@ import MyPage from "./pages/myPage/MyPage";
 import { Route, Routes, useLocation } from "react-router-dom";
 import MoreInfo from "./pages/login/moreInfo/MoreInfo";
 import KakaoOauth from "./pages/login/KakaoOauth";
-import MainPage from "./pages/mianPage/mainPage";
+import MainPage from "./pages/mainPage/mainPage";
 import InvitePage from "./pages/myPage/components/InvitePage";
 import CalendarDetail from "./pages/myPage/components/CalendarDetail";
-
+import MainDetail from "./pages/mainDetail/MainDetail";
+import Medal from "./pages/medalPage/Medal";
+import ExercisePage from "./pages/exercisePage/ExercisePage";
+import CustomPage from "./pages/exercisePage/customPage/customPage";
+import ChatPage from "./pages/chatPage/chatPage";
+import ChatRoom from "./pages/chatPage/chatRoom";
+import ExerciseList from "./pages/exercisePage/exerciseListPage/ExerciseList";
+import Request from "./pages/request/Request";
 function App() {
   return (
     <div className="App">
@@ -31,6 +38,14 @@ function App() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path='/invite' element={<InvitePage/>}/>
         <Route path="/record/:date" element={<CalendarDetail />} />
+        <Route path="/home/detail/:id" element={<MainDetail />} />
+        <Route path="/home/medal" element={<Medal/>} />
+        <Route path="/exercise" element={<ExercisePage/>} />
+        <Route path="/exercise/custom" element={<CustomPage/>} />
+        <Route path="/chatlist" element={<ChatPage/>} />
+        <Route path="/chatlist/:roomId" element={<ChatRoom />} />
+        <Route path="/exercise/list" element={<ExerciseList/>} />
+        <Route path="/request" element={<Request/>} />
       </Routes>
     </div>
   );

@@ -16,7 +16,14 @@ import LineChart from "./components/BodyStatLineChart";
 import Calendar from "./components/Calendar";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import BackButton from "./components/BackButton";
+import BackButton from "../../components/BackButton";
+import { DeleteAccountModal } from "./components/DeleteAccount";
+import axiosInstance from "../../apis/axiosInstance";
+import { useProfileImage } from "../../hooks/useProfileImage";
+
+interface HistoryItem {
+  imageUrl: string;
+}
 
 type WorkoutDetail = {
   name: string;
@@ -32,42 +39,45 @@ type WorkoutRecord = {
 };
 
 export default function MyPage() {
-  // 뒤로가기
   const navigate = useNavigate();
-  // 탭
   const [activeTab, setActiveTab] = useState<"record" | "profile">("record");
-
-  // 프로필
   const [bodyData, setBodyData] = useState({
     height: "",
     weight: "",
     muscle: "",
     bodyFat: "",
+    userName: "",
   });
 
-  const [profileImg, setProfileImg] = useState<string>(Profile);
+  const { profileImg, setProfileImg } = useProfileImage();
   const [showHistory, setShowHistory] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  const handleDeleteConfirm = () => {
+    setShowDeleteModal(false);
+    alert("회원탈퇴 요청 실행 (실제 호출 x)");
+  };
 
-  // 신체 정보 조회
   useEffect(() => {
     const recentBodyData = async () => {
       const token = sessionStorage.getItem("Authorization");
       if (!token) return;
 
       try {
-        const res = await fetch("https://hanseifitu.shop/physical-infos", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axiosInstance.get("/api/v2/physical-infos", {
+          headers: { Authorization: token },
         });
-        if (!res.ok) throw new Error("최신 신체 정보 get 실패");
-        const data = await res.json();
+        
+        const data = res.data;
         setBodyData({
           height: data.height?.toString() || "",
           weight: data.weight?.toString() || "",
           muscle: data.muscle?.toString() || "",
           bodyFat: data.bodyFat?.toString() || "",
+          userName: data.userName || "",
         });
       } catch (error) {
-        console.error("신체 정보 조회 에러:", error);
+        console.error(error);
       }
     };
     recentBodyData();
@@ -77,6 +87,7 @@ export default function MyPage() {
     const numeric = value.replace(/[^0-9]/g, "");
     setBodyData((prev) => ({ ...prev, [id]: numeric }));
   };
+  
 
   const saveLogic = async () => {
     const token = sessionStorage.getItem("Authorization");
@@ -90,79 +101,64 @@ export default function MyPage() {
     };
 
     try {
-      const res = await fetch("https://hanseifitu.shop/physical-infos", {
-        method: "POST",
+      await axiosInstance.post("/api/v2/physical-infos", payload, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("저장 실패");
-      alert("수정 완료되었습니다!");
-      console.log("저장된 데이터:", payload);
+      alert("수정 완료!");
     } catch (err) {
-      console.error("저장 에러:", err);
-      alert("저장에 실패했습니다.");
+      console.error(err);
+      alert("저장 실패");
     }
   };
 
-  // 프로필 이미지 최신화
   useEffect(() => {
     const latestProfile = async () => {
       const token = sessionStorage.getItem("Authorization");
       if (!token) return;
 
       try {
-        const res = await fetch("https://hanseifitu.shop/body-image", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axiosInstance.get("/api/v2/profile-image", {
+          headers: { Authorization: token },
         });
-        if (!res.ok) throw new Error("이미지 불러오기 실패");
-        const data = await res.json();
-        setProfileImg(data.imageUrl?.trim() || Profile);
+        
+        const imgUrl = res.data.imageUrl;
+        setProfileImg(imgUrl ? imgUrl.trim() : Profile);
       } catch (err) {
-        console.error("프로필 이미지 에러:", err);
-        setProfileImg(Profile);
+        console.error("프로필 조회 실패", err);
+
+        try {
+          const historyRes = await axiosInstance.get("/api/v2/profile-image/history", {
+            headers: { Authorization: token },
+          });
+
+          const historyList = historyRes.data.profileImages || [];
+          const validHistory = historyList.filter((item: HistoryItem) => item.imageUrl && item.imageUrl.trim() !== "");
+
+          if (validHistory.length > 0) {
+            setProfileImg(validHistory[0].imageUrl);
+          } else {
+            setProfileImg(Profile);
+          }
+        } catch (historyErr) {
+          console.error("히스토리 조회도 실패:", historyErr);
+          setProfileImg(Profile);
+        }
       }
     };
     latestProfile();
-  }, []);
+  }, [setProfileImg])
 
   const imageChange = (newImage: string) => setProfileImg(newImage);
 
-  // 기록(캘린더)
   const [month, setMonth] = useState<Date>(new Date());
-  const [records, setRecords] = useState<WorkoutRecord[]>([]);
-
-  // 로그인 연동 되면은 캘린더 쪽 API 연동 해야함
-  useEffect(() => {
-    setRecords([
-      {
-        date: format(new Date(), "yyyy-MM-dd"),
-        workout: [
-          { name: "벤치프레스", categoryId: 1, sets: 3, weight: 60, repsPerSet: 10 },
-        ],
-      },
-    ]);
-  }, []);
-
+  
   return (
     <MyPageLayout>
-      {/* 상단 탭 */}
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "40px",
-          borderBottom: "1px solid #CED4D8",
-        }}
-      >
-        <BackButton
-          onClick={() => navigate(-1)}
-          position={{ top: "20px", left: "20px" }}
-          size={15}
-        />
+      <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "40px", borderBottom: "1px solid #CED4D8", }}>
+        <BackButton />
 
         <Button
           onClick={() => setActiveTab("record")}
@@ -191,8 +187,7 @@ export default function MyPage() {
           프로필
         </Button>
       </div>
-
-      {/* 탭 내용 */}
+      
       {activeTab === "record" && (
         <div>
           <div
@@ -202,7 +197,7 @@ export default function MyPage() {
               backgroundColor: "#F2F4F5",
             }}
           />
-          <Calendar records={records} month={month} onMonthChange={setMonth} />
+          <Calendar month={month} onMonthChange={setMonth} />
         </div>
       )}
 
@@ -217,7 +212,7 @@ export default function MyPage() {
           />
           <TopSection>
             <BodyInfoSection>
-              <SectionTitle>김주민</SectionTitle>
+              <SectionTitle>{bodyData.userName || "사용자 이름 손실"}</SectionTitle>
               <Row>
                 <BodyInput
                   name="키"
@@ -311,26 +306,14 @@ export default function MyPage() {
             </ProfileWrapper>
           </TopSection>
 
-          <div
-            style={{
-              width: "100%",
-              height: "10px",
-              backgroundColor: "#F2F4F5",
-            }}
-          />
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5",}} />
           <LineChart />
-          <div
-            style={{
-              width: "100%",
-              height: "10px",
-              backgroundColor: "#F2F4F5",
-            }}
-          />
+          <div style={{ width: "100%", height: "10px", backgroundColor: "#F2F4F5",}} />
 
           <div
             style={{
               width: "100%",
-              height: "60px",
+              height: "80px",
               backgroundColor: "white",
               borderBottom: "1px solid #CED4DB",
               display: "flex",
@@ -345,9 +328,16 @@ export default function MyPage() {
           </div>
           <div
             style={{ width: "100%", height: "60px", backgroundColor: "white" }}
+            role="button"
+            onClick={() => setShowDeleteModal(true)}
           >
             <p> &nbsp;&nbsp; 회원 탈퇴 </p>
           </div>
+          <DeleteAccountModal
+            isOpen={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteConfirm}
+          />
         </>
       )}
     </MyPageLayout>

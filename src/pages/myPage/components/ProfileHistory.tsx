@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import ProfileCropper from "./ProfileCropper";
 import * as S from "./styles/ProfileHistory.styled";
 import DefaultProfile from "../../../assets/images/default_profileImage.png";
+import axiosInstance from "../../../apis/axiosInstance";
 
 interface ProfileHistoryProps {
   onClose: () => void;
@@ -9,7 +10,11 @@ interface ProfileHistoryProps {
 }
 
 interface HistoryItem {
-  url: string;
+  imageUrl: string; 
+}
+
+interface HistoryResponse {
+  profileImages: HistoryItem[];
 }
 
 export default function ProfileHistory({ onClose, onImageChange }: ProfileHistoryProps) {
@@ -18,23 +23,24 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
   const [historyImages, setHistoryImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const API_BASE = "https://hanseifitu.shop";
-
   useEffect(() => {
     const fetchHistory = async () => {
       const token = sessionStorage.getItem("Authorization");
       if (!token) return;
 
       try {
-        const res = await fetch(`${API_BASE}/body-image/history`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await axiosInstance.get<HistoryResponse>('/api/v2/profile-image/history', {
+          headers: { Authorization: token },
         });
+        
+        const list = res.data.profileImages || [];
 
-        if (!res.ok) throw new Error("히스토리 불러오기 실패");
+        const validUrls = list
+          .filter(item => item.imageUrl && item.imageUrl.trim() !== "")
+          .map(item => item.imageUrl);
 
-        const data: HistoryItem[] = await res.json();
-        const urls = data.map((item) => item.url || DefaultProfile);
-        setHistoryImages(urls);
+        setHistoryImages(validUrls);
+        
       } catch (err) {
         console.error("프로필 히스토리 에러:", err);
       }
@@ -68,57 +74,47 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
 
     try {
       const blob = await (await fetch(croppedImage)).blob();
+      
       const formData = new FormData();
       formData.append("image", blob, "profile.jpg");
 
-      const res = await fetch(`${API_BASE}/body-image`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+      const res = await axiosInstance.post('/api/v2/profile-image', formData, {
+        headers: { 
+          Authorization: token,
+        },
       });
 
-      if (!res.ok) throw new Error("이미지 업로드 실패");
-
-      const data = await res.json();
-      const newUrl = data.imageUrl || DefaultProfile;
+      const newUrl = res.data.imageUrl || res.data.url || DefaultProfile; 
+      
       const updated = [newUrl, ...historyImages].slice(0, 10);
       setHistoryImages(updated);
       onImageChange(newUrl);
       onClose();
     } catch (err) {
       console.error("이미지 업로드 에러:", err);
+      alert("이미지 업로드에 실패했습니다.");
     } finally {
       setShowCropper(false);
       setSelectedImage(null);
     }
   };
 
-  // 이미지 히스토리 - 이미지 삭제
   const handleDelete = async (imgUrl: string) => {
+    if (!window.confirm("이 프로필 이미지를 삭제하시겠습니까?")) return;
     const token = sessionStorage.getItem("Authorization");
     if (!token) return;
 
     try {
-      const res = await fetch(`${API_BASE}/body-image`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      await axiosInstance.delete('/api/v2/profile-image', {
+        headers: { 
+          Authorization: token,
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ imageUrl: imgUrl }),
+        data: { imageUrl: imgUrl }, 
       });
-
-      if (!res.ok) throw new Error("이미지 삭제 실패");
-
       const updated = historyImages.filter((url) => url !== imgUrl);
       setHistoryImages(updated);
-
-      // 이미지 삭제하고 어떤 이미지로 변경할지 선택해야함
-      if (updated.length === 0) {
-        onImageChange(DefaultProfile);
-      } else if (imgUrl === updated[0]) {
-        onImageChange(updated[0]);
-      }
+      
     } catch (err) {
       console.error("이미지 삭제 에러:", err);
       alert("이미지 삭제에 실패했습니다.");
@@ -149,15 +145,24 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
               <S.HistoryTitle>이전 이미지</S.HistoryTitle>
               <S.HistoryList>
                 {historyImages.map((img, idx) => (
-                  <S.HistoryImage
-                    key={idx}
-                    src={img || DefaultProfile}
-                    alt={`history-${idx}`}
-                    onClick={() => {
-                      onImageChange(img || DefaultProfile);
-                      onClose();
-                    }}
-                  />
+                  <S.HistoryItemWrapper key={idx}>
+                    <S.HistoryImage
+                      src={img || DefaultProfile}
+                      alt={`history-${idx}`}
+                      onClick={() => {
+                        onImageChange(img || DefaultProfile);
+                        onClose();
+                      }}
+                    />
+                    <S.DeleteHistoryButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(img);
+                      }}
+                    >
+                      ✖
+                    </S.DeleteHistoryButton>
+                  </S.HistoryItemWrapper>
                 ))}
               </S.HistoryList>
             </S.HistorySection>

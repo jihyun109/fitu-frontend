@@ -29,7 +29,7 @@ const MoreInfo: React.FC = () => {
 
  const handleSubmit = async () => {
   try {
-    const res = await axiosInstance.post("/users/info", {
+    const res = await axiosInstance.post("/api/v2/users/info", {
       name: formData.name,
       universityEmail: formData.universityEmail,
       height: formData.height,

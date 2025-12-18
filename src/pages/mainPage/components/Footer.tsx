@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
         style={{ justifyContent: "left" }}
       >
         <img src={Request} />
-        <div>요청하기</div>
+        <div>인증하기</div>
       </FooterItem>
       <FooterItem
         onClick={() => navigate("/exercise")}

@@ -97,12 +97,15 @@
 @font-face {
   font-family: "Noto Sans JP";
   font-style: normal;
-  font-weight: 500; 
+  font-weight: 500;
   font-display: swap;
   src: url("./assets/fonts/NotoSansJP-Medium.ttf");
 }
 
 .App {
   font-family: "Noto Sans KR";
-   color: #333333;
+  color: #333333;
+  max-width: 440px;
+  min-height: 100vh;
+  margin: 0 auto; 
 }

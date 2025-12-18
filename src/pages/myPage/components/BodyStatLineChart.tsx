@@ -51,15 +51,15 @@ export default function BodyStatLineChart() {
         return;
       }
 
-      const startDate = dayjs().subtract(3, "month").format("YYYY-MM-DD");
+      const startDate = dayjs().subtract(12, "month").format("YYYY-MM-DD");
       const endDate = dayjs().format("YYYY-MM-DD");
 
       try {
-        const url = `https://hanseifitu.shop/physical-infos/muscle-bodyfat?startDate=${startDate}&endDate=${endDate}`;
+        const url = `https://hanseifitu.shop/api/v2/physical-infos/muscle-bodyfat?startDate=${startDate}&endDate=${endDate}`;
 
         const res = await fetch(url, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -71,7 +71,6 @@ export default function BodyStatLineChart() {
 
         const text = await res.text();
 
-        // HTML 반환 체크
         if (text.startsWith("<")) {
           setErrorMessage("서버에서 예상치 못한 HTML 응답이 반환되었습니다.");
           return;
@@ -79,7 +78,6 @@ export default function BodyStatLineChart() {
 
         const result: FetchResult = JSON.parse(text);
 
-        // JSON 배열인지 확인
         if (!Array.isArray(result)) {
           setErrorMessage("서버에서 예상치 못한 데이터 구조가 반환되었습니다.");
           return;

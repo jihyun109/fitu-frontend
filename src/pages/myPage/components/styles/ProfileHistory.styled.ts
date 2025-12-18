@@ -14,8 +14,9 @@ export const Overlay = styled.div`
 export const Modal = styled.div`
   background: white;
   padding: 24px;
+  margin-right: 10px;
   border-radius: 12px;
-  max-width: 400px;
+  max-width: 340px;
   width: 100%;
   position: relative;
 `;
@@ -100,5 +101,37 @@ export const DeleteButton = styled.button`
 
   &:hover {
     background-color: #dc2626;
+  }
+`;
+
+export const HistoryItemWrapper = styled.div`
+  position: relative; 
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const DeleteHistoryButton = styled.button`
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+  &:hover {
+    background-color: #d9363e;
   }
 `;
