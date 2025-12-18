@@ -6,7 +6,7 @@ import BackButton from "../../components/BackButton";
 import SendIcon from "../../assets/images/Send.svg";
 import SockJS from "sockjs-client";
 
-const SERVER_SOCKET_URL = 'http://ec2-3-35-143-24.ap-northeast-2.compute.amazonaws.com:8080/ws-stomp';
+const SERVER_SOCKET_URL = 'http://ec2-3-35-143-24.ap-northeast-2.compute.amazonaws.com:8080/ws';
 
 interface Message {
   id: number;
