@@ -16,7 +16,9 @@ const KakaoOauth = () => {
           console.log(response);
 
           const jwtToken = response.data.token;
+          const userid = response.data.userid;
           sessionStorage.setItem("Authorization", jwtToken);
+          sessionStorage.setItem("userid", userid);
 
           if (response.status === 201) {
             navigate("/home");
