@@ -24,6 +24,7 @@ interface ServerHistoryItem {
   message: string;
   senderProfileUrl: string;
   sendTime: string;
+  senderId: number; 
 }
 
 interface HistoryResponse {
@@ -39,7 +40,7 @@ const ChatRoom: React.FC = () => {
   const stompClient = useRef<Client | null>(null);
   
   const myName = sessionStorage.getItem("userName") || "나"; 
-  const myUserId = sessionStorage.getItem("userId");
+  const myUserId = sessionStorage.getItem("userid");
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -53,7 +54,14 @@ const ChatRoom: React.FC = () => {
         });
         
         const historyData = response.data.messages.map((item, index) => {
-          const isMe = item.senderName === myName;
+          let isMe = false;
+          
+          if (myUserId && item.senderId !== undefined) {
+             isMe = String(item.senderId) === String(myUserId);
+          } else {
+             isMe = item.senderName === myName;
+          }
+
           return {
             id: `history-${index}-${item.sendTime}`,
             text: item.message,
@@ -67,18 +75,18 @@ const ChatRoom: React.FC = () => {
         setMessages(historyData); 
 
       } catch (error) {
-        console.error(error);
+        console.error("채팅 내역 조회 실패:", error);
       }
     };
 
     fetchHistory();
-  }, [roomId, myName]);
+  }, [roomId, myName, myUserId]);
 
   useEffect(() => {
     const token = sessionStorage.getItem("Authorization");
 
     if (!roomId || !token) {
-      console.error("오류가 발생하였습니다.");
+      console.error("오류");
       return;
     }
 
@@ -112,7 +120,7 @@ const ChatRoom: React.FC = () => {
               
               setMessages((prev) => [...prev, newMessage]);
             } catch (err) {
-              console.error(err);
+              console.error("에러:", err);
             }
           }
         });
