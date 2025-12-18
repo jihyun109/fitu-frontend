@@ -16,7 +16,8 @@ const KakaoOauth = () => {
           console.log(response);
 
           const jwtToken = response.data.token;
-          const userid = response.data.userid;
+          const userid = response.data.userId;
+          console.log(userid)
           sessionStorage.setItem("Authorization", jwtToken);
           sessionStorage.setItem("userid", userid);
 
