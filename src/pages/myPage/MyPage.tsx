@@ -21,6 +21,10 @@ import { DeleteAccountModal } from "./components/DeleteAccount";
 import axiosInstance from "../../apis/axiosInstance";
 import { useProfileImage } from "../../hooks/useProfileImage";
 
+interface HistoryItem {
+  imageUrl: string;
+}
+
 type WorkoutDetail = {
   name: string;
   categoryId: number;
@@ -103,10 +107,10 @@ export default function MyPage() {
           "Content-Type": "application/json",
         },
       });
-      alert("수정 완료되었습니다!");
+      alert("수정 완료!");
     } catch (err) {
       console.error(err);
-      alert("저장에 실패했습니다.");
+      alert("저장 실패");
     }
   };
 
@@ -123,29 +127,34 @@ export default function MyPage() {
         const imgUrl = res.data.imageUrl;
         setProfileImg(imgUrl ? imgUrl.trim() : Profile);
       } catch (err) {
-        console.error(err);
-        setProfileImg(Profile);
+        console.error("프로필 조회 실패", err);
+
+        try {
+          const historyRes = await axiosInstance.get("/api/v2/profile-image/history", {
+            headers: { Authorization: token },
+          });
+
+          const historyList = historyRes.data.profileImages || [];
+          const validHistory = historyList.filter((item: HistoryItem) => item.imageUrl && item.imageUrl.trim() !== "");
+
+          if (validHistory.length > 0) {
+            setProfileImg(validHistory[0].imageUrl);
+          } else {
+            setProfileImg(Profile);
+          }
+        } catch (historyErr) {
+          console.error("히스토리 조회도 실패:", historyErr);
+          setProfileImg(Profile);
+        }
       }
     };
     latestProfile();
-  }, []);
+  }, [setProfileImg])
 
   const imageChange = (newImage: string) => setProfileImg(newImage);
 
   const [month, setMonth] = useState<Date>(new Date());
-  const [records, setRecords] = useState<WorkoutRecord[]>([]);
-
-  useEffect(() => {
-    setRecords([
-      {
-        date: format(new Date(), "yyyy-MM-dd"),
-        workout: [
-          { name: "벤치프레스", categoryId: 1, sets: 3, weight: 60, repsPerSet: 10 },
-        ],
-      },
-    ]);
-  }, []);
-
+  
   return (
     <MyPageLayout>
       <div style={{ width: "100%", display: "flex", justifyContent: "center", marginTop: "40px", borderBottom: "1px solid #CED4D8", }}>
@@ -188,7 +197,7 @@ export default function MyPage() {
               backgroundColor: "#F2F4F5",
             }}
           />
-          <Calendar records={records} month={month} onMonthChange={setMonth} />
+          <Calendar month={month} onMonthChange={setMonth} />
         </div>
       )}
 

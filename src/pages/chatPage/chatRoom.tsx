@@ -32,7 +32,7 @@ interface HistoryResponse {
 }
 
 const ChatRoom: React.FC = () => {
-  const { roomId } = useParams<{ roomId: string }>(); 
+  const { roomId } = useParams<{ roomId: string }>();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

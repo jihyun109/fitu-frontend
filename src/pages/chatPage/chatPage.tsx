@@ -18,7 +18,7 @@ interface ChatRoomResponse {
   roomId: number;
   roomName: string;
   lastMessage: string;
-  imgUrl: string | null;
+  imgUrl: string;
 }
 
 const ChatPage: React.FC = () => {
@@ -79,11 +79,11 @@ const ChatPage: React.FC = () => {
       if (response.data && response.data.id) {
         navigate(`/chatlist/${response.data.id}`);
       } else {
-        console.error("채팅방 ID 응답 없음");
+        console.error("채팅 응답없음");
       }
     } catch (error) {
-      console.error("채팅방 생성 실패:", error);
-      alert("채팅방 생성 중 오류가 발생했습니다.");
+      console.error("채팅 생성 실패:", error);
+
     }
   };
 
