@@ -5,7 +5,7 @@ import defaultImage from '../../../assets/images/default_profileImage.png';
 export interface Friend {
   id: number;
   name: string;
-  profileImage?: string;
+  profileImage: string;
 }
 
 interface FriendListProps {
@@ -14,63 +14,79 @@ interface FriendListProps {
 }
 
 const FriendList: React.FC<FriendListProps> = ({ friends, onFriendClick }) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = defaultImage;
+  };
+
+  if (friends.length === 0) {
+    return <EmptyMessage>친구가 없습니다.</EmptyMessage>;
+  }
+
   return (
-    <FriendsListContainer>
+    <ListContainer>
       {friends.map((friend) => (
-        <FriendItem 
-          key={friend.id} 
-          onClick={() => onFriendClick(friend.id, friend.name)}
-          style={{ cursor: 'pointer' }}
-        >
-          <ProfileAvatar>
-            <img src={friend.profileImage || defaultImage} alt={`${friend.name} 프로필`} />
-          </ProfileAvatar>
-          <ProfileName>{friend.name}</ProfileName>
+        <FriendItem key={friend.id} onClick={() => onFriendClick(friend.id, friend.name)}>
+          <ProfileImage 
+            src={friend.profileImage || defaultImage} 
+            alt={friend.name}
+            onError={handleImageError}
+          />
+          <FriendName>{friend.name}</FriendName>
         </FriendItem>
       ))}
-    </FriendsListContainer>
+    </ListContainer>
   );
 };
 
 export default FriendList;
 
-const FriendsListContainer = styled.div`
+const ListContainer = styled.div`
   display: flex;
+  gap: 12px;
   overflow-x: auto;
-  gap: 16px;
   padding-bottom: 8px;
   
   &::-webkit-scrollbar {
-    display: none; 
+    display: none;
   }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const FriendItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 60px;
-  gap: 8px;
-  &:active {
-    opacity: 0.7;
-  }
+  cursor: pointer;
+  
+  min-width: 60px; 
+  flex-shrink: 0; 
 `;
 
-const ProfileAvatar = styled.div`
+const ProfileImage = styled.img`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #e0e0e0;
-  overflow: hidden;
-  
-  & > img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  object-fit: cover;
+  margin-bottom: 6px;
+  border: 1px solid #eee;
+  background-color: #f0f0f0;
 `;
 
-const ProfileName = styled.span`
-  font-size: 14px; 
+const FriendName = styled.span`
+  font-size: 13px;
   color: #333;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+`;
+
+const EmptyMessage = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  width: 100%;
 `;

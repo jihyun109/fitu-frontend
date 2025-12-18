@@ -305,7 +305,7 @@ export default function MyPage() {
           <div
             style={{
               width: "100%",
-              height: "60px",
+              height: "80px",
               backgroundColor: "white",
               borderBottom: "1px solid #CED4DB",
               display: "flex",
