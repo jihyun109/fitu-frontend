@@ -25,13 +25,16 @@ export default function ProfileHistory({ onClose, onImageChange }: ProfileHistor
       if (!token) return;
 
       try {
-        const res = await axiosInstance.get('/api/v2/profile-image/history', {
+        const res = await axiosInstance.get<HistoryItem[]>('/api/v2/profile-image/history', {
           headers: { Authorization: token },
         });
+        
+        const validUrls = res.data
+          .filter(item => item.url && item.url.trim() !== "")
+          .map(item => item.url);
 
-        const data: HistoryItem[] = res.data;
-        const urls = data.map((item) => item.url || DefaultProfile);
-        setHistoryImages(urls);
+        setHistoryImages(validUrls);
+        
       } catch (err) {
         console.error("프로필 히스토리 에러:", err);
       }
