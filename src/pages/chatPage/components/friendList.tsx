@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import defaultImage from '../../../assets/images/default_profileImage.png';
 
 export interface Friend {
   id: number;
@@ -13,6 +14,10 @@ interface FriendListProps {
 }
 
 const FriendList: React.FC<FriendListProps> = ({ friends, onFriendClick }) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = defaultImage;
+  };
+
   if (friends.length === 0) {
     return <EmptyMessage>친구가 없습니다.</EmptyMessage>;
   }
@@ -21,7 +26,11 @@ const FriendList: React.FC<FriendListProps> = ({ friends, onFriendClick }) => {
     <ListContainer>
       {friends.map((friend) => (
         <FriendItem key={friend.id} onClick={() => onFriendClick(friend.id, friend.name)}>
-          <ProfileImage src={friend.profileImage} alt={friend.name} />
+          <ProfileImage 
+            src={friend.profileImage || defaultImage} 
+            alt={friend.name}
+            onError={handleImageError}
+          />
           <FriendName>{friend.name}</FriendName>
         </FriendItem>
       ))}
@@ -40,6 +49,8 @@ const ListContainer = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 const FriendItem = styled.div`
@@ -47,7 +58,9 @@ const FriendItem = styled.div`
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  min-width: 60px;
+  
+  min-width: 60px; 
+  flex-shrink: 0; 
 `;
 
 const ProfileImage = styled.img`
@@ -57,6 +70,7 @@ const ProfileImage = styled.img`
   object-fit: cover;
   margin-bottom: 6px;
   border: 1px solid #eee;
+  background-color: #f0f0f0;
 `;
 
 const FriendName = styled.span`
@@ -74,4 +88,5 @@ const EmptyMessage = styled.div`
   text-align: center;
   color: #888;
   font-size: 14px;
+  width: 100%;
 `;
