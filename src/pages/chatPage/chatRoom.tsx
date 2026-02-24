@@ -8,7 +8,8 @@ import SendIcon from "../../assets/images/Send.svg";
 import axiosInstance from '../../apis/axiosInstance';
 import DefaultProfile from "../../assets/images/default_profileImage.png";
 
-const SERVER_SOCKET_URL = 'http://ec2-3-35-143-24.ap-northeast-2.compute.amazonaws.com:8080/ws';
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+const SERVER_SOCKET_URL = `${SERVER_URL}/ws`;
 
 interface Message {
   id: number | string;
