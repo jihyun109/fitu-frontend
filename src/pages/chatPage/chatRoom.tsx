@@ -102,21 +102,19 @@ const ChatRoom: React.FC = () => {
         client.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           if (message.body) {
             try {
+              // ChatMessageResponseDTO: { roomId, senderId, senderName, message }
               const receivedMsg = JSON.parse(message.body);
-              
-              let isMe = false;
-              if (myUserId && receivedMsg.senderId) {
-                 isMe = String(receivedMsg.senderId) === String(myUserId);
-              } else {
-                 isMe = receivedMsg.sender === myName;
-              }
+
+              const isMe = myUserId
+                ? String(receivedMsg.senderId) === String(myUserId)
+                : false;
 
               const newMessage: Message = {
                 id: Date.now(),
                 text: receivedMsg.message,
                 sender: isMe ? 'me' : 'other',
-                senderName: receivedMsg.senderName || receivedMsg.sender || "알 수 없음",
-                senderProfile: receivedMsg.senderProfileUrl || DefaultProfile, 
+                senderName: receivedMsg.senderName || "알 수 없음",
+                senderProfile: DefaultProfile,
               };
               
               setMessages((prev) => [...prev, newMessage]);
