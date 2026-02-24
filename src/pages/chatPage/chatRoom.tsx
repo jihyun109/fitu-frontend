@@ -8,8 +8,7 @@ import SendIcon from "../../assets/images/Send.svg";
 import axiosInstance from '../../apis/axiosInstance';
 import DefaultProfile from "../../assets/images/default_profileImage.png";
 
-const SERVER_URL = process.env.REACT_APP_SERVER_URL;
-const SERVER_SOCKET_URL = `${SERVER_URL}/ws`;
+const SERVER_SOCKET_URL = `${process.env.REACT_APP_SERVER_URL}/ws`;
 
 interface Message {
   id: number | string;
@@ -102,19 +101,21 @@ const ChatRoom: React.FC = () => {
         client.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           if (message.body) {
             try {
-              // ChatMessageResponseDTO: { roomId, senderId, senderName, message }
               const receivedMsg = JSON.parse(message.body);
-
-              const isMe = myUserId
-                ? String(receivedMsg.senderId) === String(myUserId)
-                : false;
+              
+              let isMe = false;
+              if (myUserId && receivedMsg.senderId) {
+                 isMe = String(receivedMsg.senderId) === String(myUserId);
+              } else {
+                 isMe = receivedMsg.sender === myName;
+              }
 
               const newMessage: Message = {
                 id: Date.now(),
                 text: receivedMsg.message,
                 sender: isMe ? 'me' : 'other',
-                senderName: receivedMsg.senderName || "알 수 없음",
-                senderProfile: DefaultProfile,
+                senderName: receivedMsg.senderName || receivedMsg.sender || "알 수 없음",
+                senderProfile: receivedMsg.senderProfileUrl || DefaultProfile, 
               };
               
               setMessages((prev) => [...prev, newMessage]);
