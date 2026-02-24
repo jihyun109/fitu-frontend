@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import Header from '../mainPage/components/Header';
 import Footer from '../mainPage/components/Footer';
 import FriendList, { Friend } from './components/friendList';
@@ -10,7 +9,7 @@ import ChatRoomList, { ChatRoom } from './components/chatRoomList';
 import defaultImage from '../../assets/images/default_profileImage.png';
 import axiosInstance from '../../apis/axiosInstance';
 
-const SERVER_SOCKET_URL = `${process.env.REACT_APP_SERVER_URL}/ws`;
+const SERVER_SOCKET_URL = `${process.env.REACT_APP_SERVER_URL}/ws`.replace(/^http/, 'ws');
 
 interface FriendResponse {
   userId: number;
@@ -72,7 +71,7 @@ const ChatPage: React.FC = () => {
     if (!token || !myUserId) return;
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(SERVER_SOCKET_URL),
+      brokerURL: SERVER_SOCKET_URL,
       connectHeaders: {
         Authorization: token,
       },

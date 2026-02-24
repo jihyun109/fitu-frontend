@@ -2,13 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Client } from '@stomp/stompjs';
 import { useParams } from 'react-router-dom';
-import SockJS from 'sockjs-client';
 import BackButton from "../../components/BackButton";
 import SendIcon from "../../assets/images/Send.svg";
 import axiosInstance from '../../apis/axiosInstance';
 import DefaultProfile from "../../assets/images/default_profileImage.png";
 
-const SERVER_SOCKET_URL = `${process.env.REACT_APP_SERVER_URL}/ws`;
+const SERVER_SOCKET_URL = `${process.env.REACT_APP_SERVER_URL}/ws`.replace(/^http/, 'ws');
 
 interface Message {
   id: number | string;
@@ -91,8 +90,7 @@ const ChatRoom: React.FC = () => {
     }
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(SERVER_SOCKET_URL),
-      
+      brokerURL: SERVER_SOCKET_URL,
       connectHeaders: {
         Authorization: token, 
       },
