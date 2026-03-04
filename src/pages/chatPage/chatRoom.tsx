@@ -9,6 +9,17 @@ import DefaultProfile from "../../assets/images/default_profileImage.png";
 
 const SERVER_SOCKET_URL = `${process.env.REACT_APP_SERVER_URL}/ws`.replace(/^http/, 'ws');
 
+const SenderProfileImg: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+  const [imgSrc, setImgSrc] = useState(src || DefaultProfile);
+  return (
+    <ProfileImg
+      src={imgSrc}
+      alt={alt}
+      onError={() => setImgSrc(DefaultProfile)}
+    />
+  );
+};
+
 interface Message {
   id: number | string;
   text: string;
@@ -172,11 +183,7 @@ const ChatRoom: React.FC = () => {
             <MessageRow key={msg.id || index} $isMine={msg.sender === 'me'}>
               {msg.sender !== 'me' && (
                 <ProfileWrapper>
-                  <ProfileImg 
-                    src={msg.senderProfile || DefaultProfile} 
-                    alt={msg.senderName}
-                    onError={(e) => { e.currentTarget.src = DefaultProfile; }}
-                  />
+                  <SenderProfileImg src={msg.senderProfile || DefaultProfile} alt={msg.senderName} />
                   <SenderName>{msg.senderName}</SenderName>
                 </ProfileWrapper>
               )}
