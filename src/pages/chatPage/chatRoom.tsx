@@ -48,8 +48,10 @@ const ChatRoom: React.FC = () => {
   const [input, setInput] = useState('');
   
   const stompClient = useRef<Client | null>(null);
-  
-  const myName = sessionStorage.getItem("userName") || "나"; 
+  const lastMessageTimestampRef = useRef<string | null>(null);
+  const isReconnectRef = useRef<boolean>(false);
+
+  const myName = sessionStorage.getItem("userName") || "나";
   const myUserId = sessionStorage.getItem("userid");
 
   useEffect(() => {
@@ -82,7 +84,11 @@ const ChatRoom: React.FC = () => {
           } as Message;
         });
         
-        setMessages(historyData); 
+        setMessages(historyData);
+
+        if (response.data.messages.length > 0) {
+          lastMessageTimestampRef.current = response.data.messages.at(-1)!.sendTime;
+        }
 
       } catch (error) {
         console.error("채팅 내역 조회 실패:", error);
@@ -103,36 +109,69 @@ const ChatRoom: React.FC = () => {
     const client = new Client({
       brokerURL: SERVER_SOCKET_URL,
       connectHeaders: {
-        Authorization: token, 
+        Authorization: token,
       },
-      
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+
       onConnect: () => {
+        console.log('[STOMP] onConnect | isReconnect:', isReconnectRef.current, '| lastTimestamp:', lastMessageTimestampRef.current);
         client.subscribe(`/sub/chat/room/${roomId}`, (message) => {
           if (message.body) {
             try {
               const receivedMsg = JSON.parse(message.body);
-              
-              let isMe = false;
-              if (myUserId && receivedMsg.senderId) {
-                 isMe = String(receivedMsg.senderId) === String(myUserId);
-              } else {
-                 isMe = receivedMsg.sender === myName;
-              }
+
+              const isMe = myUserId ? String(receivedMsg.senderId) === String(myUserId) : false;
 
               const newMessage: Message = {
                 id: Date.now(),
                 text: receivedMsg.message,
                 sender: isMe ? 'me' : 'other',
-                senderName: receivedMsg.senderName || receivedMsg.sender || "알 수 없음",
-                senderProfile: receivedMsg.senderProfileUrl || DefaultProfile, 
+                senderName: receivedMsg.senderName || "알 수 없음",
+                senderProfile: receivedMsg.senderProfileUrl || DefaultProfile,
               };
-              
+
+              if (receivedMsg.sendTime) {
+                lastMessageTimestampRef.current = receivedMsg.sendTime;
+              }
+
               setMessages((prev) => [...prev, newMessage]);
             } catch (err) {
               console.error("에러:", err);
             }
           }
         });
+
+        if (isReconnectRef.current && lastMessageTimestampRef.current) {
+          console.log('[STOMP] 재연결 감지 → 누락 메시지 fetch:', lastMessageTimestampRef.current);
+          const token = sessionStorage.getItem("Authorization");
+          axiosInstance.get<HistoryResponse>(
+            `/api/v2/chat/message/${roomId}?after=${encodeURIComponent(lastMessageTimestampRef.current)}`,
+            { headers: { Authorization: token } }
+          ).then(response => {
+            console.log('[STOMP] 누락 메시지 수:', response.data.messages.length);
+            if (response.data.messages.length === 0) return;
+
+            const missed = response.data.messages.map((item, index) => {
+              const isMe = myUserId ? String(item.senderId) === String(myUserId) : item.senderName === myName;
+              return {
+                id: `missed-${index}-${item.sendTime}`,
+                text: item.message,
+                sender: isMe ? 'me' : 'other',
+                senderName: item.senderName,
+                senderProfile: item.senderProfileUrl || DefaultProfile,
+                time: item.sendTime,
+              } as Message;
+            });
+
+            setMessages(prev => [...prev, ...missed]);
+            lastMessageTimestampRef.current = response.data.messages.at(-1)!.sendTime;
+          }).catch(err => {
+            console.error("누락 메시지 fetch 실패:", err);
+          });
+        }
+
+        isReconnectRef.current = true;
       },
 
       reconnectDelay: 5000,
