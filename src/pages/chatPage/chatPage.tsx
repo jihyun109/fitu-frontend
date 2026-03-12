@@ -31,93 +31,70 @@ const ChatPage: React.FC = () => {
   const stompClient = useRef<Client | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = sessionStorage.getItem("Authorization");
-      if (!token) return;
+    const token = sessionStorage.getItem("Authorization");
+    if (!token) return;
+    const headers = { Authorization: token };
 
-      const headers = { Authorization: token };
-
+    const setup = async () => {
       try {
-        const friendRes = await axiosInstance.get('/friend', { headers });
+        const [friendRes, roomRes] = await Promise.all([
+          axiosInstance.get('/friend', { headers }),
+          axiosInstance.get('/api/v2/chat/room/list', { headers }),
+        ]);
+
         const friendList = friendRes.data.friendInfoList.map((f: FriendResponse) => ({
           id: f.userId,
           name: f.userName,
-          profileImage: f.profileImageUrl || defaultImage
+          profileImage: f.profileImageUrl || defaultImage,
         }));
         setFriends(friendList);
-
-        const roomRes = await axiosInstance.get('/api/v2/chat/room/list', { headers });
 
         const roomList = roomRes.data.chatRoomList.map((r: ChatRoomResponse) => ({
           id: r.roomId,
           name: r.roomName,
           lastMessage: r.lastMessage,
-          profileImage: r.imgUrl || defaultImage
+          profileImage: r.imgUrl || defaultImage,
         }));
         setChatRooms(roomList);
 
+        // 채팅방별 구독: 새 메시지 수신 시 lastMessage 업데이트 후 맨 위로 이동
+        const client = new Client({
+          brokerURL: SERVER_SOCKET_URL,
+          connectHeaders: { Authorization: token },
+          onConnect: () => {
+            roomList.forEach((room: ChatRoom) => {
+              client.subscribe(`/sub/chat/room/${room.id}`, (message) => {
+                if (!message.body) return;
+                try {
+                  const data = JSON.parse(message.body);
+                  setChatRooms((prev) => {
+                    const idx = prev.findIndex((r) => r.id === data.roomId);
+                    if (idx === -1) return prev;
+                    const updated = [...prev];
+                    updated[idx] = { ...updated[idx], lastMessage: data.message };
+                    const [moved] = updated.splice(idx, 1);
+                    return [moved, ...updated];
+                  });
+                } catch (err) {
+                  console.error("채팅방 목록 업데이트 에러:", err);
+                }
+              });
+            });
+          },
+          reconnectDelay: 5000,
+        });
+
+        client.activate();
+        stompClient.current = client;
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
       }
     };
 
-    fetchData();
-  }, []);
-
-  // WebSocket 구독: 채팅방 목록 실시간 업데이트
-  useEffect(() => {
-    const token = sessionStorage.getItem("Authorization");
-    const myUserId = sessionStorage.getItem("userid");
-    if (!token || !myUserId) return;
-
-    const client = new Client({
-      brokerURL: SERVER_SOCKET_URL,
-      connectHeaders: {
-        Authorization: token,
-      },
-      onConnect: () => {
-        client.subscribe(`/sub/chat/room/list/${myUserId}`, (message) => {
-          if (message.body) {
-            try {
-              const data = JSON.parse(message.body);
-              setChatRooms((prev) => {
-                const existingIndex = prev.findIndex((room) => room.id === data.roomId);
-                if (existingIndex !== -1) {
-                  // 기존 채팅방의 lastMessage 업데이트 후 맨 위로 이동
-                  const updated = [...prev];
-                  updated[existingIndex] = {
-                    ...updated[existingIndex],
-                    lastMessage: data.message,
-                  };
-                  const [movedRoom] = updated.splice(existingIndex, 1);
-                  return [movedRoom, ...updated];
-                } else {
-                  // 새 채팅방이면 목록 맨 위에 추가
-                  return [
-                    {
-                      id: data.roomId,
-                      name: data.senderName,
-                      lastMessage: data.message,
-                      profileImage: defaultImage,
-                    },
-                    ...prev,
-                  ];
-                }
-              });
-            } catch (err) {
-              console.error("채팅방 목록 업데이트 에러:", err);
-            }
-          }
-        });
-      },
-      reconnectDelay: 5000,
-    });
-
-    client.activate();
-    stompClient.current = client;
+    setup();
 
     return () => {
-      if (client.active) client.deactivate();
+      if (stompClient.current?.active) stompClient.current.deactivate();
     };
   }, []);
 
